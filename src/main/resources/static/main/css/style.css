@@ -1,0 +1,72 @@
+:root {
+    --primary-orange: #f37321;
+    --dark-navy: #1a1d23;
+}
+
+body { font-family: 'Noto Sans KR', sans-serif; color: #333; }
+
+/* 네비게이션 */
+.main-nav { transition: 0.4s ease; padding: 20px 0; }
+.main-nav.scrolled { background: white !important; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 10px 0; border-bottom: 1px solid #eee; }
+.main-nav.scrolled .navbar-brand, .main-nav.scrolled .nav-link, .main-nav.scrolled .nav-auth-link { color: #222 !important; }
+.navbar-brand { font-family: 'Oswald', sans-serif; font-size: 1.4rem; color: white !important; }
+.nav-link { color: rgba(255,255,255,0.9) !important; margin: 0 10px; }
+.nav-link.active, .nav-link:hover { color: var(--primary-orange) !important; }
+.nav-auth-link { color: white !important; text-decoration: none; margin-right: 15px; font-size: 0.95rem; }
+
+/* 히어로 */
+.hero-section { height: 100vh; background: url('banner.jpg') center/cover; position: relative; display: flex; align-items: center; }
+.hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+.hero-container { position: relative; z-index: 2; }
+
+/* 공통 섹션 */
+.section-title { font-size: 2.5rem; margin-bottom: 15px; }
+
+/* 버튼 */
+.btn-orange { background: var(--primary-orange); border: none; }
+.btn-orange:hover { background: #d65d10; }
+.btn-orange-outline { border: 1px solid var(--primary-orange); color: var(--primary-orange); }
+
+/* 클럽/상품 카드 */
+.club-card, .product-card { transition: 0.3s; border-radius: 15px; overflow: hidden; }
+.club-card:hover { transform: translateY(-10px); }
+.club-info p { margin-bottom: 5px; font-size: 0.9rem; }
+.club-info i { width: 20px; color: #999; }
+.badge-level { background: #fff4ed; color: var(--primary-orange); border: 1px solid var(--primary-orange); font-size: 0.75rem; }
+.badge-level.high { background: #fff0f0; color: #e63946; border-color: #e63946; }
+
+/* 친선경기/게시판 리스트 */
+.vs-badge { background: #f8f9fa; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid #ddd; }
+.match-item, .board-item { transition: 0.2s; cursor: pointer; }
+.match-item:hover, .board-item:hover { background-color: #fbfbfb; }
+
+/* 랭킹 */
+.rank-badge { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: #eee; font-weight: bold; font-size: 0.85rem; }
+.rank-badge.gold { background: #fff3bf; color: #f08c00; }
+
+/* 하단 CTA */
+.cta-section { background-color: var(--primary-orange); }
+.text-orange { color: var(--primary-orange) !important; }
+
+/* 푸터 */
+.footer { background: var(--dark-navy); color: white; }
+.footer .social-links i { font-size: 1.5rem; color: white; opacity: 0.6; transition: 0.3s; }
+.footer .social-links i:hover { opacity: 1; }
+/* 푸터 링크 스타일 추가 */
+.footer-link {
+    text-decoration: none !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    transition: all 0.3s ease;
+    display: inline-block;
+    padding: 2px 0;
+}
+.footer-link:hover {
+    color: #f37321 !important; /* 주황색 포인트 컬러 */
+    transform: translateX(5px); /* 살짝 오른쪽으로 이동하는 효과 */
+}
+.footer h6 {
+    color: white;
+    border-bottom: 2px solid #f37321;
+    display: inline-block;
+    padding-bottom: 5px;
+}
