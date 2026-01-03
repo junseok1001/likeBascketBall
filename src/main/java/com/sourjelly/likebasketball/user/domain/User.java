@@ -8,14 +8,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name="`user`")
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -25,10 +26,16 @@ public class User {
     private long id;
     private String loginId;
     private String password;
-    private String userStatus;
+
+    @Enumerated(EnumType.STRING)
+    private UserStatus  userStatus;
+
     private String nickName;
-    private String birthday;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthday;
+    private String phoneNumber;
     private String email;
+
 
     @CreationTimestamp
     private LocalDateTime createdAt;
