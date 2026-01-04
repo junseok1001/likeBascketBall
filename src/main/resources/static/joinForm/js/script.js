@@ -86,7 +86,7 @@ $(document).ready(function() {
                     "birthday":birthday, "email":email, "phoneNumber":phoneNumber}
             , success: function(response){
                 if(response.result === "success"){
-                    location.href="/main";
+                    location.href="/user/login";
                 }else{
                     alert("회원가입 실패!!");
                 }

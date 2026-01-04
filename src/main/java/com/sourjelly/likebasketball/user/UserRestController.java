@@ -1,13 +1,14 @@
 package com.sourjelly.likebasketball.user;
 
 
+import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.domain.UserStatus;
 import com.sourjelly.likebasketball.user.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.*;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +51,25 @@ public class UserRestController {
         }else{
             resultMap.put("result", "fail");
         }
+        return resultMap;
+    }
+
+    @PostMapping("/login")
+    public Map<String, String> login(
+            @RequestParam String loginId
+            , @RequestParam String password
+            , HttpSession session){
+
+        Map<String , String> resultMap = new HashMap<>();
+        User user = userService.isExistId(loginId, password);
+
+        if(user != null){
+            resultMap.put("result", "success");
+            session.setAttribute("user", user);
+        }else{
+            resultMap.put("result", "fail");
+        }
+
         return resultMap;
     }
 

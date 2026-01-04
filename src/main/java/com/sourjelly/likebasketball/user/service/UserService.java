@@ -5,7 +5,6 @@ import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.domain.UserStatus;
 import com.sourjelly.likebasketball.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,8 +18,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public boolean insertMember(
             String loginId
@@ -55,6 +53,20 @@ public class UserService {
     public boolean isDuplicateId(String loginId){
 
         return !userRepository.existsByLoginId(loginId);
+    }
+
+    public User isExistId(
+            String loginId
+            , String password){
+
+        User user = userRepository.findByLoginId(loginId);
+        String encodingPassword = user.getPassword();
+
+        if(user != null && passwordEncoder.matches(password, encodingPassword)){
+            return user;
+        }
+
+        return null;
     }
 
 }
