@@ -40,6 +40,10 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // WebFlux (WebClient 사용을 위해 필요)
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 
 }

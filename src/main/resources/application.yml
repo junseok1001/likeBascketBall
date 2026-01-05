@@ -19,9 +19,10 @@ spring:
         registration:
           kakao:
             client-id: ${kakao.apiKey}
-            redirect-uri: ${kakao.redirect_uri}
+            redirect-uri: ${kakao.redirect-uri}
+            client-secret: ${kakao.client-secret}
             scope:
-              - profile_nickname
+              - nickname
               - account_email
             authorization-grant-type: authorization_code
             client-authentication-method: post

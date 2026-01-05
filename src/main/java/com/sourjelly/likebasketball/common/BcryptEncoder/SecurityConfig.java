@@ -25,7 +25,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // 초기 개발 시 편리함을 위해 CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // 모든 페이지 접근 허용 (우선 실행 확인용)
+                        // 콜백 주소는 누구나 접근 가능해야 합니다.
+                        .requestMatchers("/", "/user/kakao/callback", "/login/**").permitAll()
+                        .anyRequest().permitAll() // 그 외 요청은 인증 필요
                 )
                 .formLogin(login -> login.disable()) // 기본 로그인 페이지 비활성화 (필요시 설정)
                 .httpBasic(basic -> basic.disable());
