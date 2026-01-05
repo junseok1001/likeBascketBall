@@ -19,7 +19,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // 2. HTTP 보안 설정 (이 부분이 없어서 에러가 났던 것입니다)
+    // 2. HTTP 보안 설정
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
