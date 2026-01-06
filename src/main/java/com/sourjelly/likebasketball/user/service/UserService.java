@@ -3,6 +3,7 @@ package com.sourjelly.likebasketball.user.service;
 
 import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.domain.UserStatus;
+import com.sourjelly.likebasketball.user.dto.KakaoUserInfoDto;
 import com.sourjelly.likebasketball.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,11 +11,13 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -57,12 +60,12 @@ public class UserService {
     }
 
     //카카오톡 사용자 정보 요청
-    public Map<String, Object> getUserInfo(String accessToken){
+    public KakaoUserInfoDto getUserInfo(String accessToken){
         return webClient.get()
                 .uri("https://kapi.kakao.com/v2/user/me")
                 .header(HttpHeaders.AUTHORIZATION,"Bearer " + accessToken)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .bodyToMono(KakaoUserInfoDto.class)
                 .block();
     }
 

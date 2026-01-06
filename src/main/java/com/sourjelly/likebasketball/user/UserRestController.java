@@ -3,10 +3,12 @@ package com.sourjelly.likebasketball.user;
 
 import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.domain.UserStatus;
+import com.sourjelly.likebasketball.user.dto.KakaoUserInfoDto;
 import com.sourjelly.likebasketball.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -21,23 +23,6 @@ public class UserRestController {
 
     private final UserService userService;
 
-
-
-    @GetMapping("/kakao/callback")
-    public String kakaoLogin(
-            @RequestParam String code
-            , HttpSession session){
-        // 인증된 코드로 토큰 발행하기
-        String accessToken = userService.getAccessToken(code);
-        System.out.println("성공! 발급된 토큰: " + accessToken);
-
-        // 토큰으로 사용자 정보를 받아오기
-        Map<String, Object> userInfo = userService.getUserInfo(accessToken);
-        System.out.println("사용자 정보: " + userInfo);
-
-        session.setAttribute("user", userInfo);
-        return "로그인이 완료되었습니다";
-    }
 
     @PostMapping("/join")
     public Map<String, String> join(
