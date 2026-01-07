@@ -69,6 +69,16 @@ public class UserService {
                 .block();
     }
 
+    public User SocialLogin(String email){
+        User user = userRepository.findByEmail(email);
+
+        if(user == null){
+            return null;
+        }else{
+            return user;
+        }
+    }
+
     //회원가입 기능
     public boolean insertMember(
             String loginId
@@ -78,6 +88,7 @@ public class UserService {
             , LocalDate birthday
             , String phoneNumber
             , String email
+            , String provider
     ){
         String encodingPassword = passwordEncoder.encode(password);
 
@@ -89,6 +100,7 @@ public class UserService {
                 .birthday(birthday)
                 .phoneNumber(phoneNumber)
                 .email(email)
+                .provider(provider)
                 .build();
 
         try{

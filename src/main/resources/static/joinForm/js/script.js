@@ -1,21 +1,5 @@
 $(document).ready(function() {
 
-    // === [추가] 카카오 로그인 정보 자동 채우기 로직 ===
-    const urlParams = new URLSearchParams(window.location.search);
-    const kakaoEmail = urlParams.get('email');
-    const kakaoNickname = urlParams.get('nickname');
-
-    // 이메일이 파라미터에 있으면 값을 넣고 수정 불가 처리
-    if (kakaoEmail) {
-        $("#emailInput").val(kakaoEmail).attr("readonly", true);
-    }
-    // 닉네임이 파라미터에 있으면 값을 넣고 수정 불가 처리
-    if (kakaoNickname) {
-        $("#nickNameInput").val(kakaoNickname).attr("readonly", true);
-    }
-    // ===========================================
-
-
     var isDuplicateCheck = false;
     // 회원 유형 카드 선택 효과
     $('.status-card').click(function() {
@@ -74,6 +58,7 @@ $(document).ready(function() {
         let email = $("#emailInput").val();
         let birthday = $("#birthdayInput").val();
         let phoneNumber = $("#phoneNumberInput").val();
+        let provider = $("#joinProviderInput").val();
 
 
         // 유효성 검사 예시
@@ -100,7 +85,8 @@ $(document).ready(function() {
             , url:"/user/join"
             , data:{"loginId":loginId, "password":password,
                     "nickName":nickName, "userStatus":userStatus,
-                    "birthday":birthday, "email":email, "phoneNumber":phoneNumber}
+                    "birthday":birthday, "email":email, "phoneNumber":phoneNumber
+                    ,"provider": provider}
             , success: function(response){
                 if(response.result === "success"){
                     location.href="/user/login";

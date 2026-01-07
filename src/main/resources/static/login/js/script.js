@@ -46,14 +46,14 @@ $(document).ready(function() {
     });
 
     // 카카오 로그인 버튼 클릭
-    $('.btn-kakao').on('click', function(e) {
-        e.preventDefault();
-        console.log("카카오 로그인 API 호출");
-        
-        // 카카오 SDK 초기화 및 로그인 로직이 들어갈 자리입니다.
-        alert("카카오톡 간편 로그인을 시작합니다.");
-        // window.location.href = 'YOUR_KAKAO_AUTH_URL';
-    });
+    // $('.btn-kakao').on('click', function(e) {
+    //     e.preventDefault();
+    //     console.log("카카오 로그인 API 호출");
+    //
+    //     // 카카오 SDK 초기화 및 로그인 로직이 들어갈 자리입니다.
+    //     alert("카카오톡 간편 로그인을 시작합니다.");
+    //     // window.location.href = 'YOUR_KAKAO_AUTH_URL';
+    // });
 
 
 

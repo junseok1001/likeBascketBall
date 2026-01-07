@@ -32,10 +32,11 @@ public class UserRestController {
             , @RequestParam UserStatus userStatus
             , @RequestParam LocalDate birthday
             , @RequestParam String phoneNumber
-            , @RequestParam String email){
+            , @RequestParam String email
+            , @RequestParam String provider){
 
         Map<String, String> resultMap = new HashMap<>();
-        if(userService.insertMember(loginId, password, nickName, userStatus, birthday, phoneNumber, email)){
+        if(userService.insertMember(loginId, password, nickName, userStatus, birthday, phoneNumber, email, provider)){
             resultMap.put("result", "success");
         }else{
             resultMap.put("result", "fail");
@@ -72,8 +73,8 @@ public class UserRestController {
         }else{
             resultMap.put("result", "fail");
         }
-
         return resultMap;
     }
+
 
 }
