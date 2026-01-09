@@ -7,11 +7,8 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @RequestMapping("/user")
 @Controller
@@ -19,31 +16,31 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class UserController {
 
     private final UserService userService;
-
+    // 회원가입 페이지 이동
     @GetMapping("/join")
     public String joinPage(){
         return "/joinForm/joinForm";
     }
-
+    // 로그인 페이지 이동
     @GetMapping("/login")
     public String loginPage(){
         return "/login/login";
     }
-
+    // 로그아웃 후 메인페이지 이동
     @GetMapping("/logout")
     public String logout(HttpSession session){
         session.invalidate();
 
         return "redirect:/main";
     }
-
-    @GetMapping("/modify")
+    // 회원정보 상세 페이지 이동
+    @GetMapping("/detail")
     public String modify(){
-        return "/modify/usermodify";
+        return "/modify/detail";
     }
 
 
-
+    // 카카오톡 로그인 콜백 후 redirect
     @GetMapping("/kakao/callback")
     public String kakaoLogin(
             @RequestParam String code
@@ -66,8 +63,6 @@ public class UserController {
 
                 return "redirect:/user/join";
             }
-
-
     }
 
 

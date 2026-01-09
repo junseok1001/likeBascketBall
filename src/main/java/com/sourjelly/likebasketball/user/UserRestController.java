@@ -1,11 +1,13 @@
 package com.sourjelly.likebasketball.user;
 
 
+import com.sourjelly.likebasketball.common.responseApi.ResponseApi;
 import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.domain.UserStatus;
 import com.sourjelly.likebasketball.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -22,7 +24,25 @@ public class UserRestController {
 
     private final UserService userService;
 
+    // 회원정보 수정 기능
+    @PutMapping("/modify/{id}")
+    public ResponseEntity<ResponseApi<Void>> modify(
+            @PathVariable long id
+            , @RequestParam String password
+            , @RequestParam String nickname
+            , @RequestParam String phoneNumber){
 
+        if(userService.changeUserInfo(id, password, nickname, phoneNumber) != null){
+            return ResponseEntity.ok(ResponseApi.success("회원정보 수정 완료"));
+        }else{
+            // 예외 처리 추가사항
+            // 1. 파라미터가 다 안들어 왔을경우 1)빈곳있다고 알려주거나 원래 값 넣어주기 bad-request 시 api에 실패 띄우기
+            // 2.
+            return ResponseEntity.ok(ResponseApi.fail("회원정보 수정 실패") );
+        }
+    }
+
+    //회원가입 기능
     @PostMapping("/join")
     public Map<String, String> join(
             @RequestParam String loginId
@@ -52,7 +72,7 @@ public class UserRestController {
             if(!session.getAttribute("provider").toString().equals(provider)){
                 message.append("기본제공된 정보가 수정했습니다. 다시 시도해보세요\n");
             }
-
+                // 카카오톡 소셜 로그인
                 // 카카오톡 정보로 회원가입하기
             if(message.length() == 0 ){
                 if(userService.insertMember(loginId, password, nickName, userStatus, birthday, phoneNumber, email, provider)){
@@ -80,7 +100,7 @@ public class UserRestController {
 
         return resultMap;
     }
-
+    // 아이디 중복 기능
     @PostMapping("/isDuplicate")
     public Map<String, String> isDuplicateId(
             @RequestParam String loginId){
@@ -93,7 +113,7 @@ public class UserRestController {
         }
         return resultMap;
     }
-
+    // 로그인 기능
     @PostMapping("/login")
     public Map<String, String> login(
             @RequestParam String loginId

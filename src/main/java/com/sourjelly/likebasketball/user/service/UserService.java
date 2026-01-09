@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -130,6 +131,23 @@ public class UserService {
         }
 
         return null;
+    }
+
+    // 회원정보 수정
+    public User changeUserInfo(long id, String password , String nickname, String phoneNumber){
+
+       Optional<User> optionalUser = userRepository.findById(id);
+       String encodeingPassword = passwordEncoder.encode(password);
+
+       if(optionalUser.isPresent()){
+            User user = optionalUser.get();
+            user = user.toBuilder().password(encodeingPassword).nickName(nickname).phoneNumber(phoneNumber).build();
+            User modifyUser = userRepository.save(user);
+
+            return modifyUser;
+       }
+       return null;
+
     }
 
 
