@@ -69,12 +69,12 @@
 
             <div class="mb-3">
                 <label for="nickNameInput" class="form-label">닉네임 <span>*</span></label>
-                <input th:value="${nickname}" th:readonly="${nickname != null}" type="text" class="form-control" id="nickNameInput" name="nick_name" maxlength="32" placeholder="사용하실 닉네임 입력" required>
+                <input th:value="${session.nickname}" th:readonly="${session.nickname != null}" type="text" class="form-control" id="nickNameInput" name="nick_name" maxlength="32" placeholder="사용하실 닉네임 입력" required>
             </div>
 
             <div class="mb-3">
                 <label for="emailInput" class="form-label">이메일 주소 <span>*</span></label>
-                <input th:value="${email}" th:readonly="${email != null}"  type="email" class="form-control" id="emailInput" name="email" maxlength="32" placeholder="example@basketball.com" required>
+                <input th:value="${session.email}" th:readonly="${session.email != null}"  type="email" class="form-control" id="emailInput" name="email" maxlength="32" placeholder="example@basketball.com" required>
             </div>
 
             <div class="row">
@@ -90,7 +90,7 @@
 
             <!-- local로그인 시 local value / kakao 로그인시 kakao value로 나눠서 로그인 -->
             <div class="mb-3">
-                <input th:value="${provider != null ? provider : 'local'}" type="input" class="form-control" id="joinProviderInput" value="local" readonly>
+                <input th:value="${session.provider != null ? session.provider : 'local'}" type="input" class="form-control" id="joinProviderInput" value="local" readonly>
             </div>
 
             <button type="submit" class="btn-submit">가입 신청하기</button>

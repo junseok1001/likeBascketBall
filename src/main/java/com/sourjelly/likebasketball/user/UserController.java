@@ -30,11 +30,16 @@ public class UserController {
         return "/login/login";
     }
 
-    @PostMapping("/logout")
+    @GetMapping("/logout")
     public String logout(HttpSession session){
         session.invalidate();
 
         return "redirect:/main";
+    }
+
+    @GetMapping("/modify")
+    public String modify(){
+        return "/modify/usermodify";
     }
 
 
@@ -42,8 +47,7 @@ public class UserController {
     @GetMapping("/kakao/callback")
     public String kakaoLogin(
             @RequestParam String code
-            , HttpSession session
-            , RedirectAttributes redirectAttributes){
+            , HttpSession session){
         // 인증된 코드로 토큰 발행하기
         String accessToken = userService.getAccessToken(code);
         System.out.println("발급된 토큰: " + accessToken);
@@ -55,13 +59,15 @@ public class UserController {
                 session.setAttribute("user", userService.SocialLogin(userInfo.getKakaoAccount().getEmail()));
                 return "redirect:/main";
             }else{
-                // 토큰으로 사용자 정보를 받아오기
-                redirectAttributes.addAttribute("nickname", userInfo.getProperties().getNickname());
-                redirectAttributes.addAttribute("email", userInfo.getKakaoAccount().getEmail());
-                redirectAttributes.addAttribute("provider", "Kakao");
+                // 1회성 데이터 저장 - session
+                session.setAttribute("nickname", userInfo.getProperties().getNickname());
+                session.setAttribute("email", userInfo.getKakaoAccount().getEmail());
+                session.setAttribute("provider", "Kakao");
 
                 return "redirect:/user/join";
             }
+
+
     }
 
 

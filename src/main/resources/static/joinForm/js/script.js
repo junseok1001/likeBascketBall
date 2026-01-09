@@ -1,5 +1,6 @@
 $(document).ready(function() {
 
+
     var isDuplicateCheck = false;
     // 회원 유형 카드 선택 효과
     $('.status-card').click(function() {
@@ -90,8 +91,11 @@ $(document).ready(function() {
             , success: function(response){
                 if(response.result === "success"){
                     location.href="/user/login";
-                }else{
+                }else if(response.result === "fail"){
                     alert("회원가입 실패!!");
+                }else{
+                    alert(response.message);
+                    location.reload();
                 }
             }
             , error: function(){

@@ -3,7 +3,6 @@ package com.sourjelly.likebasketball.user;
 
 import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.domain.UserStatus;
-import com.sourjelly.likebasketball.user.dto.KakaoUserInfoDto;
 import com.sourjelly.likebasketball.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +32,50 @@ public class UserRestController {
             , @RequestParam LocalDate birthday
             , @RequestParam String phoneNumber
             , @RequestParam String email
-            , @RequestParam String provider){
+            , @RequestParam String provider
+            , HttpSession session){
 
         Map<String, String> resultMap = new HashMap<>();
-        if(userService.insertMember(loginId, password, nickName, userStatus, birthday, phoneNumber, email, provider)){
-            resultMap.put("result", "success");
+
+//        ---------------------------------------------------------
+//        이곳에서 데이터의 유효성 검사가 있고 넘어가야 될거 같음
+        StringBuilder message = new StringBuilder();
+        if(session.getAttribute("email") != null){
+            if(!session.getAttribute("email").toString().equals(email)){
+                message.append("카카오톡 email이 수정되었습니다. 다시확인하세요\n");
+            }
+
+            if(!session.getAttribute("nickname").toString().equals(nickName)){
+                message.append("카카오에서 제공된 이름이 수정되었습니다. 다시 확인하세요\n");
+            }
+
+            if(!session.getAttribute("provider").toString().equals(provider)){
+                message.append("기본제공된 정보가 수정했습니다. 다시 시도해보세요\n");
+            }
+
+                // 카카오톡 정보로 회원가입하기
+            if(message.length() == 0 ){
+                if(userService.insertMember(loginId, password, nickName, userStatus, birthday, phoneNumber, email, provider)){
+                    session.removeAttribute("nickname");
+                    session.removeAttribute("email");
+                    session.removeAttribute("provider");
+                    resultMap.put("result", "success");
+                }else{
+                    resultMap.put("result", "fail");
+                }
+            }else{
+                resultMap.put("message", message.toString());
+            }
         }else{
-            resultMap.put("result", "fail");
+            // 일반 회원 가입하기
+            if(userService.insertMember(loginId, password, nickName, userStatus, birthday, phoneNumber, email, provider)){
+                session.removeAttribute("nickname");
+                session.removeAttribute("email");
+                session.removeAttribute("provider");
+                resultMap.put("result", "success");
+            }else{
+                resultMap.put("result", "fail");
+            }
         }
 
         return resultMap;
