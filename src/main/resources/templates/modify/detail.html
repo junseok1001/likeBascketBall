@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basketball Hub - 회원정보 수정</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/main/css/style.css">
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top main-nav scrolled">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/main">
+            <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" alt="logo" width="30" class="me-2"> Basketball Hub
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto fw-medium">
+                <li class="nav-item"><a class="nav-link" href="/">홈</a></li>
+                <li class="nav-item"><a class="nav-link" href="/#clubs">동호회모집</a></li>
+                <li class="nav-item"><a class="nav-link" href="/#shop">농구용품샵</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-3">
+                <div class="dropdown">
+                    <button class="btn border-0" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle fs-3 text-dark"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="edit-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold section-title">회원정보 수정</h2>
+                    <p class="text-muted">아이디를 제외한 정보를 안전하게 변경하실 수 있습니다.</p>
+                </div>
+
+                <div class="card edit-card p-4 p-md-5 bg-white">
+                    <form id="editForm">
+                        <div class="mb-4">
+                            <label class="form-label">아이디</label>
+                            <input type="text" th:value="${session.user.getLoginId()}" class="form-control readonly-field" readonly>
+                            <div class="form-text text-muted">아이디는 변경하실 수 없습니다.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label">새 비밀번호</label>
+                            <input type="password" id="password" name="password" class="form-control" placeholder="변경할 비밀번호를 입력하세요">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="passwordConfirm" class="form-label">새 비밀번호 확인</label>
+                            <input type="password" id="passwordConfirm" class="form-control" placeholder="다시 한번 입력하세요">
+                            <div id="pwMessage" class="form-text mt-2"></div>
+                        </div>
+
+                        <hr class="my-4 opacity-25">
+
+                        <div class="mb-4">
+                            <label for="nickname" class="form-label">닉네임</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" id="nickname" name="nickname" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <label for="phoneNumber" class="form-label">휴대전화 번호</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                                <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="010-0000-0000">
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button id="confirmBtn" th:data-modify="${session.user.getId()}" type="submit" class="btn btn-orange text-white py-3 fw-bold rounded-3 shadow-sm">
+                                <i class="fas fa-check-circle me-2"></i>수정 내용 저장하기
+                            </button>
+                            <button type="button" class="btn btn-light py-3 fw-bold text-muted border" onclick="location.href='/main'">
+                                돌아가기
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer py-5 text-white">
+    <div class="container text-center opacity-50 small">
+        <p>© 2025 Basketball Hub. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function() {
+
+        // 추가해야되는기능 check를 해서 input 활성화 해서 원래 있던 값에서 바꿔주기
+
+        let $pw = $('#password');
+        let $pwConfirm = $('#passwordConfirm');
+        let $msg = $('#pwMessage');
+
+        // 1. 비밀번호 실시간 일치 확인
+        function checkPassword() {
+            if ($pw.val() === "" && $pwConfirm.val() === "") {
+                $msg.text("");
+                return;
+            }
+
+            if ($pw.val() === $pwConfirm.val()) {
+                $msg.text("비밀번호가 일치합니다.").css('color', 'green');
+            } else {
+                $msg.text("비밀번호가 일치하지 않습니다.").css('color', 'red');
+            }
+        }
+
+        $pw.on('input', checkPassword);
+        $pwConfirm.on('input', checkPassword);
+
+        $('#editForm').on("submit", function(e){
+            e.preventDefault();
+            let nickname = $('#nickname').val();
+            let phoneNumber = $('#phoneNumber').val();
+            let data = $("#confirmBtn").data("modify");
+            let pw = $pw.val();
+
+            if(pw.length < 8) {
+                alert('비밀번호는 8자 이상이어야 합니다.');
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("nickname", nickname);
+            formData.append("phoneNumber", phoneNumber);
+            formData.append("password", pw);
+            if (confirm("정보를 수정하시겠습니까?")) {
+
+                $.ajax({
+                    type:"put"
+                    , url:"/user/modify/"+ data
+                    , data: formData
+                    , processData: false
+                    , contentType: false
+                    , success: function(response){
+                        if(response.result === "success"){
+                            location.href="/main";
+                        }else{
+                            location.reload();
+                        }
+                    }
+                    ,error: function(){
+                        alert("에러");
+                    }
+
+                })
+            }else{
+                console.log("수정을 취소합니다.");
+            }
+        })
+    });
+</script>
+</body>
+</html>

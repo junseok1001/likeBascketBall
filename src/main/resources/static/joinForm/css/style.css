@@ -101,6 +101,14 @@ body {
     border: 1px solid var(--border-color);
 }
 
+/* 읽기 전용(readonly) 입력창 스타일 */
+.form-control[readonly] {
+    background-color: #f1f3f5; /* 회색 배경으로 수정 불가임을 알림 */
+    border-color: #dee2e6;
+    cursor: not-allowed; /* 마우스 커서 모양 변경 */
+    color: #495057;
+}
+
 /* 입력창 클릭(focus) 시 주황색 강조 효과 */
 .form-control:focus {
     border-color: var(--primary-orange);
@@ -138,3 +146,4 @@ body {
 }
 .login-link a { color: #666; text-decoration: none; }
 .login-link a:hover { text-decoration: underline; }
+

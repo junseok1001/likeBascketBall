@@ -35,6 +35,7 @@ public class User {
     private LocalDate birthday;
     private String phoneNumber;
     private String email;
+    private String provider;
 
 
     @CreationTimestamp

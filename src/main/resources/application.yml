@@ -13,6 +13,27 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${kakao.apiKey}
+            redirect-uri: ${kakao.redirect-uri}
+            client-secret: ${kakao.client-secret}
+            scope:
+              - nickname
+              - account_email
+            authorization-grant-type: authorization_code
+            client-authentication-method: post
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: kauth.kakao.com
+            token-uri: kauth.kakao.com
+            user-info-uri: kapi.kakao.com
+            user-name-attribute: email
+
 
 
 mybatis:
