@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basketball Hub - 동호회 모집하기</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        /* 1. 공통 변수 및 초기화 */
+        :root {
+            --primary-orange: #f37321;
+            --dark-navy: #1a1d23;
+        }
+
+        body {
+            /*  페이지 전체의 기본 글꼴, 글자색, 배경색 설정 */
+            font-family: 'Noto Sans KR', sans-serif;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+
+        /*  2. 네비게이션 바 (상단 헤더) */
+        .main-nav {
+            /* 헤더의 배경색을 흰색으로 고정하고 하단 그림자 및 테두리 추가 */
+            transition: all 0.4s ease;
+            padding: 10px 0;
+            background: white !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 1px solid #eee;
+        }
+
+        .navbar-brand {
+            /*  로고 텍스트의 폰트와 색상(검은색) 설정 */
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.4rem;
+            color: #222 !important;
+        }
+
+        .nav-link {
+            /* 메뉴 링크의 기본 색상(진한 회색)과 간격 설정 */
+            color: #444 !important;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .nav-auth-link {
+            /* 로그인/회원가입 텍스트 링크 스타일 */
+            color: #444 !important;
+            text-decoration: none;
+            margin-right: 15px;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        /* 마우스를 올렸을 때 주황색으로 변하는 효과 */
+        .nav-link:hover, .nav-auth-link:hover {
+            color: var(--primary-orange) !important;
+        }
+
+        /* 4. 폼 요소 (입력창, 라벨) */
+        .form-label {
+            /* 입력창 위에 붙는 제목의 굵기와 간격 설정 */
+            font-weight: 700;
+            color: #444;
+            margin-bottom: 8px;
+        }
+
+        .form-label span {
+            /* 필수 입력 항목을 표시하는 별표(*) 색상 */
+            color: var(--primary-orange);
+            margin-left: 3px;
+        }
+
+        .form-control {
+            /*  입력창의 안쪽 여백과 둥근 모서리 설정 */
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .form-control:focus {
+            /* 입력창을 클릭(포커스)했을 때 테두리를 주황색으로 변경 */
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 0.25rem rgba(243, 115, 33, 0.1);
+        }
+
+
+        /*  5. 버튼 및 특수 컴포넌트 */
+        .btn-orange {
+            /* 사이트 메인 컬러인 주황색 버튼 스타일 */
+            background: var(--primary-orange);
+            color: white;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .btn-orange:hover {
+            /* 버튼에 마우스 올렸을 때 조금 더 진한 주황색으로 변경 */
+            background: #d65d10;
+            color: white;
+        }
+
+        .upload-box {
+            /* 사진 업로드를 위한 점선 박스 디자인 */
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            background: white;
+            transition: 0.3s;
+        }
+
+        .upload-box:hover {
+            /* 업로드 박스에 마우스 올렸을 때 테두리와 배경색 변경 */
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top main-nav scrolled">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/main">
+            <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" alt="logo" width="30" class="me-2"> Basketball Hub
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto fw-medium">
+                <li class="nav-item"><a class="nav-link active" href="#home">홈</a></li>
+                <li class="nav-item"><a class="nav-link" href="#shop">농구용품샵</a></li>
+                <li class="nav-item"><a class="nav-link" href="#rankings">경기결과/랭킹</a></li>
+                <li class="nav-item"><a class="nav-link" href="#board">자유게시판</a></li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <th:block th:if="${session.user == null}">
+                    <a href="/user/login" class="nav-auth-link">로그인</a>
+                    <a href="/user/join" class="btn btn-orange text-white px-4 fw-bold shadow-sm">회원가입</a>
+                </th:block>
+                <th:block th:unless="${session.user== null}">
+                    <div class="dropdown">
+                        <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-fill  nav-auth-link fs-4"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
+                            <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
+                        </ul>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="form-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="mb-4">
+                    <h2 class="fw-bold mb-1">동호회 모집하기</h2>
+                    <p class="text-muted">함께 농구를 즐길 멋진 동료들을 찾아보세요.</p>
+                </div>
+
+                <div class="card form-card p-4 p-md-5 bg-white">
+                    <form id="clubForm" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label class="form-label">동호회 이름<span>*</span></label>
+                            <input type="text" name="clubName" class="form-control" placeholder="예: 시흥 슬램덩크" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">활동 지역<span>*</span> </label>
+                            <input type="text" name="location" class="form-control" placeholder="예: 경기 시흥시 정왕동" required readonly>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">정기 모임 요일<span>*</span></label>
+                                <input type="text" name="meetingDay" class="form-control" placeholder="예: 매주 토요일" required>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">정기 모임 시간<span>*</span></label>
+                                <input type="text" name="meetingTime" class="form-control" placeholder="예: 18:00 ~ 21:00" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">동호회 소개<span>*</span></label>
+                            <textarea name="content" class="form-control" rows="5" placeholder="동호회의 분위기, 활동 내용 등을 자유롭게 작성해주세요" required></textarea>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">회비</label>
+                            <input type="text" name="fee" class="form-control" placeholder="예: 월 20,000원">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">연락처<span>*</span></label>
+                            <input type="text" name="contact" class="form-control" placeholder="전화번호 또는 카카오톡 ID" required>
+                        </div>
+                        <div class="mb-3 d-flex">
+                            <div class="col-6 p-2">
+                                <label for="passwordInput" class="form-label">비밀번호 <span>*</span></label>
+                                <input type="password" class="form-control" id="passwordInput" placeholder="8자 이상의 영문, 숫자, 특수문자" required>
+                            </div>
+                            <div class="col-6 p-2">
+                                <label for="passwordConfirmInput" class="form-label">비밀번호 확인 <span>*</span></label>
+                                <input type="password" class="form-control" id="passwordConfirmInput" placeholder="8자 이상의 영문, 숫자, 특수문자" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="form-label">동호회 사진</label>
+                            <div class="upload-box" onclick="$('#fileInput').click();">
+                                <i class="bi bi-camera"></i>
+                                <p class="mb-0 text-muted">클릭하여 사진을 업로드하세요</p>
+                                <span class="small text-secondary">최대 3장, 5MB 이내</span>
+                            </div>
+                            <input type="file" id="fileInput" name="images" multiple class="d-none" accept="image/*">
+                            <div id="previewArea" class="mt-3 d-flex gap-2"></div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-light w-100 py-3 fw-bold border" onclick="history.back();">취소</button>
+                            </div>
+                            <div class="col-6">
+                                <button type="submit" class="btn btn-orange text-white w-100 py-3 fw-bold shadow-sm">등록하기</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    $(document).ready(function() {
+        // 이미지 미리보기 로직
+        $('#fileInput').on('change', function(e) {
+            let files = e.target.files;
+            $('#previewArea').empty();
+
+            for(let i=0; i<files.length; i++) {
+                let reader = new FileReader();
+                reader.onload = function(event) {
+                    let img = `<img src="${event.target.result}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">`;
+                    $('#previewArea').append(img);
+                }
+                reader.readAsDataURL(files[i]);
+            }
+        });
+
+        $("input[name='location']").on('click', function(){
+            new daum.Postcode({
+                oncomplete : function(data){
+
+                    let address = '';
+
+                    if(data.userSelectedType === 'R'){
+                        address = data.roadAddress;
+                        console.log(address);
+                    }
+
+                    $("input[name='location']").val(address);
+                }
+            }).open();
+        });
+
+
+
+
+        // 파일 보내는 로직(만들어야 됌)
+    });
+</script>
+</body>
+</html>
