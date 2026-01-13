@@ -175,28 +175,28 @@
                     <form id="clubForm" enctype="multipart/form-data">
                         <div class="mb-4">
                             <label class="form-label">동호회 이름<span>*</span></label>
-                            <input type="text" name="clubName" class="form-control" placeholder="예: 시흥 슬램덩크" required>
+                            <input type="text" name="clubName" class="form-control" placeholder="예: 시흥 슬램덩크" >
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">활동 지역<span>*</span> </label>
-                            <input type="text" name="location" class="form-control" placeholder="예: 경기 시흥시 정왕동" required readonly>
+                            <input type="text" name="location" class="form-control" placeholder="예: 경기 시흥시 정왕동"  readonly>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">정기 모임 요일<span>*</span></label>
-                                <input type="text" name="meetingDay" class="form-control" placeholder="예: 매주 토요일" required>
+                                <input type="text" name="meetingDay" class="form-control" placeholder="예: 매주 토요일" >
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">정기 모임 시간<span>*</span></label>
-                                <input type="text" name="meetingTime" class="form-control" placeholder="예: 18:00 ~ 21:00" required>
+                                <input type="text" name="meetingTime" class="form-control" placeholder="예: 18:00 ~ 21:00" >
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label">동호회 소개<span>*</span></label>
-                            <textarea name="content" class="form-control" rows="5" placeholder="동호회의 분위기, 활동 내용 등을 자유롭게 작성해주세요" required></textarea>
+                            <label class="form-label">동호회 소개</label>
+                            <textarea name="content" class="form-control" rows="5" placeholder="동호회의 분위기, 활동 내용 등을 자유롭게 작성해주세요"></textarea>
                         </div>
 
                         <div class="mb-4">
@@ -206,16 +206,16 @@
 
                         <div class="mb-4">
                             <label class="form-label">연락처<span>*</span></label>
-                            <input type="text" name="contact" class="form-control" placeholder="전화번호 또는 카카오톡 ID" required>
+                            <input type="text" name="contact" class="form-control" placeholder="전화번호 또는 카카오톡 ID" >
                         </div>
                         <div class="mb-3 d-flex">
                             <div class="col-6 p-2">
                                 <label for="passwordInput" class="form-label">비밀번호 <span>*</span></label>
-                                <input type="password" class="form-control" id="passwordInput" placeholder="8자 이상의 영문, 숫자, 특수문자" required>
+                                <input type="password" class="form-control" id="passwordInput" placeholder="8자 이상의 영문, 숫자, 특수문자" >
                             </div>
                             <div class="col-6 p-2">
                                 <label for="passwordConfirmInput" class="form-label">비밀번호 확인 <span>*</span></label>
-                                <input type="password" class="form-control" id="passwordConfirmInput" placeholder="8자 이상의 영문, 숫자, 특수문자" required>
+                                <input type="password" class="form-control" id="passwordConfirmInput" placeholder="8자 이상의 영문, 숫자, 특수문자" >
                             </div>
                         </div>
 
@@ -250,9 +250,12 @@
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>
     $(document).ready(function() {
+
+        let fileList = [];
         // 이미지 미리보기 로직
         $('#fileInput').on('change', function(e) {
             let files = e.target.files;
+
             $('#previewArea').empty();
 
             for(let i=0; i<files.length; i++) {
@@ -262,9 +265,10 @@
                     $('#previewArea').append(img);
                 }
                 reader.readAsDataURL(files[i]);
+                fileList.push(files[i]);
             }
         });
-
+        // 주소정보 기입할때 api연동해서 찾아오게 만들기
         $("input[name='location']").on('click', function(){
             new daum.Postcode({
                 oncomplete : function(data){
@@ -274,6 +278,9 @@
                     if(data.userSelectedType === 'R'){
                         address = data.roadAddress;
                         console.log(address);
+                    }else{
+                        address = data.jibunAddress;
+                        console.log(address);
                     }
 
                     $("input[name='location']").val(address);
@@ -281,10 +288,53 @@
             }).open();
         });
 
-
-
-
         // 파일 보내는 로직(만들어야 됌)
+        $("#clubForm").on("submit", function(e){
+            e.preventDefault();
+            let clubName = $("input[name='clubName']").val();
+            let location = $("input[name='location']").val();
+            let meetingDay = $("input[name='meetingDay']").val();
+            let meetingTime = $("input[name='meetingTime']").val();
+            let content = $("input[name='content']").val();
+            let fee =$("input[name='fee']").val();
+            let contact = $("input[name='contact']").val();
+            let password = $("#passwordInput").val();
+            let pwConfirm = $("#passwordConfirmInput").val();
+
+            let formData = new FormData();
+            formData.append("clubName", clubName);
+            formData.append("activityArea", location);
+            formData.append("meetingDay", meetingDay);
+            formData.append("meetingTime", meetingTime);
+            formData.append("introduce", content);
+            formData.append("price", fee);
+            formData.append("phoneNumber", contact);
+            formData.append("password", password);
+            formData.append("imagePath", fileList);
+
+            $.ajax({
+                type:"post"
+                , url:"/club"
+                , data: formData
+                , contentType: false
+                , processData: false
+                , success: function(response){
+                    if(response.result=== "success"){
+                        location.href="/main";
+                    }else{
+                        location.reload();
+                    }
+                }
+                , error: function(){
+                    alert();
+                }
+            });
+
+            // console.log(clubName + "\n" + location + "\n" + meetingDay + "\n" + meetingTime + "\n" + content + "\n" +
+            //     fee + "\n" + contact + "\n" +password + "\n" + pwConfirm+ "\n "+ fileList);
+
+        });
+
     });
 </script>
 </body>

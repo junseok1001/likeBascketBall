@@ -30,15 +30,16 @@ public class FileManger {
         }
 
         String filePath = directoryPath + "/" + file.getOriginalFilename();
+        File filePart = new File(filePath);
 
         try{
+            // 경로를 관리하는 객체 + file write를 같이 내부적으로 해준다.
+            file.transferTo(filePart);
 
-            byte[] bytes = file.getBytes();
-
-            // 파일경로를 관리하는 객체
-            Path path = Paths.get(filePath);
-            //
-            Files.write(path, bytes);
+//            // 파일경로를 관리하는 객체
+//            Path path = Paths.get(filePath);
+//            //
+//            Files.write(path, bytes);
         }catch(IOException e){
             return null;
         }
@@ -46,4 +47,5 @@ public class FileManger {
 
         return "/images" + directoryName + "/" + file.getOriginalFilename();
     }
+
 }

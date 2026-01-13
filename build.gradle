@@ -43,6 +43,9 @@ dependencies {
     // WebFlux (WebClient 사용을 위해 필요)
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+    // spring validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
 
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
 

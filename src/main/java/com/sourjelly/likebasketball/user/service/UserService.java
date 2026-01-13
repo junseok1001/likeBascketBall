@@ -6,6 +6,7 @@ import com.sourjelly.likebasketball.user.domain.UserStatus;
 import com.sourjelly.likebasketball.user.dto.KakaoUserInfoDto;
 import com.sourjelly.likebasketball.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.dao.DataAccessException;
@@ -25,6 +26,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
     private final UserRepository userRepository;
@@ -42,9 +44,9 @@ public class UserService {
 
     // 카카오톡 access token 요청
     public String getAccessToken(String code){
-        System.out.println("전송되는 clientId: [" + clientId + "]");
-        System.out.println("전송되는 redirectUri: [" + redirectUri + "]");
-        System.out.println("전송되는 code: [" + code + "]");
+        log.info("전송되는 clientId: [" + clientId + "]");
+        log.info("전송되는 redirectUri: [" + redirectUri + "]");
+        log.info("전송되는 code: [" + code + "]");
 
         return webClient.post()
                 .uri("https://kauth.kakao.com/oauth/token")
@@ -151,5 +153,7 @@ public class UserService {
     }
 
 
-
+    public void upgradeUser(User user){
+        userRepository.save(user);
+    }
 }
