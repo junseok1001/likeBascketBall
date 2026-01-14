@@ -4,6 +4,7 @@ package com.sourjelly.likebasketball.club.service;
 import com.sourjelly.likebasketball.club.domain.Club;
 import com.sourjelly.likebasketball.club.domain.ClubPhoto;
 import com.sourjelly.likebasketball.club.dto.MakeClubDto;
+import com.sourjelly.likebasketball.club.dto.ShowClubDto;
 import com.sourjelly.likebasketball.club.repository.ClubMemberRepository;
 import com.sourjelly.likebasketball.club.repository.ClubPhotoRepository;
 import com.sourjelly.likebasketball.club.repository.ClubRepository;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -56,5 +58,31 @@ public class ClubService {
         userService.upgradeUser(upgradeUser);
         return true;
     }
+
+
+    // club리스트 가져오기
+    public List<ShowClubDto> getClubInfo(){
+        List<Club> clubList = clubRepository.findAll();
+
+        List<ShowClubDto> showClubDtoList = new ArrayList<>();
+        for(Club showClub : clubList){
+            List<ClubPhoto> clubPhotoList = clubPhotoRepository.findById(showClub.getId());
+
+            List<String> imagePaths = new ArrayList<>();
+            for(ClubPhoto clubPhoto : clubPhotoList){
+                imagePaths.add(clubPhoto.getImagePath());
+            }
+            showClubDtoList.add(ShowClubDto.builder()
+                    .clubName(showClub.getClubName())
+                    .meetingDay(showClub.getMeetingDay())
+                    .meetingTime(showClub.getMeetingTime())
+                    .activityArea(showClub.getActivityArea())
+                    .introduce(showClub.getIntroduce())
+                    .phoneNumber(showClub.getPhoneNumber())
+                    .imagePath(imagePaths).build());
+        }
+        return showClubDtoList;
+    }
+
 
 }

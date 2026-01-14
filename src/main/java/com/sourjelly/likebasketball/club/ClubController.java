@@ -12,5 +12,10 @@ public class ClubController {
         return "/clubForm/clubform";
     }
 
+    @GetMapping("/club/detail")
+    public String detail(){
+        return "/clubForm/clubDetail";
+    }
+
 
 }
