@@ -25,7 +25,7 @@ public class ClubPhoto {
     private long id;
 
     private long clubId;
-    private List<String> imagePath;
+    private String imagePath;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

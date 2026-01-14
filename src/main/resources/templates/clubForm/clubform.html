@@ -295,7 +295,7 @@
             let location = $("input[name='location']").val();
             let meetingDay = $("input[name='meetingDay']").val();
             let meetingTime = $("input[name='meetingTime']").val();
-            let content = $("input[name='content']").val();
+            let content = $("textarea[name='content']").val();
             let fee =$("input[name='fee']").val();
             let contact = $("input[name='contact']").val();
             let password = $("#passwordInput").val();
@@ -310,7 +310,13 @@
             formData.append("price", fee);
             formData.append("phoneNumber", contact);
             formData.append("password", password);
-            formData.append("imagePath", fileList);
+            for(let i = 0; i< fileList.length; i++){
+                console.log(fileList[i]);
+                formData.append("imagePath", fileList[i]);
+                console.log(formData.get("imagePath"));
+            }
+
+
 
             $.ajax({
                 type:"post"
@@ -319,10 +325,10 @@
                 , contentType: false
                 , processData: false
                 , success: function(response){
-                    if(response.result=== "success"){
-                        location.href="/main";
+                    if(response.result === "success"){
+                        window.location.href="/main";
                     }else{
-                        location.reload();
+                        window.location.reload();
                     }
                 }
                 , error: function(){
@@ -330,7 +336,7 @@
                 }
             });
 
-            // console.log(clubName + "\n" + location + "\n" + meetingDay + "\n" + meetingTime + "\n" + content + "\n" +
+            // console.log(clubName + "\n" + location + "\n" + meetingDay + "\n" + meetingTime + "\n 소개" + content + "\n" +
             //     fee + "\n" + contact + "\n" +password + "\n" + pwConfirm+ "\n "+ fileList);
 
         });

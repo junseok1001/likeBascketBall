@@ -44,6 +44,7 @@
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
                                 <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
+                                <li><a th:value="${session.user.userStatus== 'CLUB_PERSISTENT'}" class="dropdown-item" href="#">동호회 관리</a></li>
                             </ul>
                         </div>
                     </th:block>

@@ -7,6 +7,7 @@ import com.sourjelly.likebasketball.club.dto.MakeClubDto;
 import com.sourjelly.likebasketball.club.repository.ClubMemberRepository;
 import com.sourjelly.likebasketball.club.repository.ClubPhotoRepository;
 import com.sourjelly.likebasketball.club.repository.ClubRepository;
+import com.sourjelly.likebasketball.common.fileManger.FileManger;
 import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.domain.UserStatus;
 import com.sourjelly.likebasketball.user.service.UserService;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -28,23 +30,28 @@ public class ClubService {
     private final ClubPhotoRepository clubPhotoRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
+
     public boolean creatClub(
             MakeClubDto makeClubDto
             , User user){
 
         String encodingPassword = passwordEncoder.encode(makeClubDto.getPassword());
-        Club club = makeClubDto.toEntity(user, encodingPassword);
+        List<String> filesPath = FileManger.saveFiles(user.getId(), makeClubDto.getImagePath());
         try{
-            Club saveClub = clubRepository.save(club);
-            long clubId = saveClub.getId();
+            Club newClub = makeClubDto.toEntity(user, encodingPassword);
+            Club club = clubRepository.save(newClub);
+            long clubId = club.getId();
 
-            ClubPhoto clubPhoto = ClubPhoto.builder().clubId(clubId).imagePath(makeClubDto.getImagePath()).build();
-            clubPhotoRepository.save(clubPhoto);
+            for(String filePath : filesPath){
+                ClubPhoto clubPhoto = ClubPhoto.builder().clubId(clubId).imagePath(filePath).build();
+                clubPhotoRepository.save(clubPhoto);
+            }
+
         }catch(DataAccessException e){
+            // 생성 실패
             return false;
         }
-
+        // 생성 완료
         User upgradeUser = user.toBuilder().userStatus(UserStatus.CLUB_PERSISTENT).build();
         userService.upgradeUser(upgradeUser);
         return true;

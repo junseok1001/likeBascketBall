@@ -33,6 +33,16 @@ spring:
             token-uri: kauth.kakao.com
             user-info-uri: kapi.kakao.com
             user-name-attribute: email
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 200MB
+
+server:
+  tomcat:
+    max-http-form-post-size: 300000000
+
+
 
 
 

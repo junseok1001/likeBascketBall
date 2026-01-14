@@ -7,10 +7,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileManger {
 
-    public final static String FILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project";
+    public final static String FILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload";
 
     public static String saveFile(long userId, MultipartFile file){
 
@@ -46,6 +48,21 @@ public class FileManger {
 
 
         return "/images" + directoryName + "/" + file.getOriginalFilename();
+    }
+
+    public static List<String> saveFiles(long userId, List<MultipartFile> files) {
+        List<String> fileUrls = new ArrayList<>();
+        if (files == null || files.isEmpty()) {
+            return fileUrls;
+        }
+
+        for (MultipartFile file : files) {
+            String url = saveFile(userId, file);
+            if (url != null) {
+                fileUrls.add(url);
+            }
+        }
+        return fileUrls;
     }
 
 }

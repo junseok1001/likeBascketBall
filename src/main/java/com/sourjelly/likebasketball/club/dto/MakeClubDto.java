@@ -6,7 +6,9 @@ import com.sourjelly.likebasketball.user.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,24 +17,25 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class MakeClubDto {
 
-    @NotBlank(message = "클럽이름은 필수입니다.")
+
     private String clubName;
 
-    @NotBlank(message = "클럽에 들어가기위한 비밀번호는 필수입니다.")
+
     private String password;
 
     private String meetingDay;
     private String meetingTime;
 
-    @NotBlank(message = "클럽 활동지역은 필수입니다.")
+
     private String activityArea;
     private String introduce;
 
     private String phoneNumber;
 
-    @NotBlank(message = "월 회비는 필수입니다.")
+
     private String price;
-    private List<String> imagePath;
+
+    private List<MultipartFile> imagePath;
 
     // 동호회 생성하는 entity만들기
     public Club toEntity(User user, String encodingPassword){
