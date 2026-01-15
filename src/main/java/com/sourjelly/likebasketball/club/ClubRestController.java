@@ -1,6 +1,7 @@
 package com.sourjelly.likebasketball.club;
 
 import com.sourjelly.likebasketball.club.dto.MakeClubDto;
+import com.sourjelly.likebasketball.club.dto.UpdateClubDto;
 import com.sourjelly.likebasketball.club.service.ClubService;
 import com.sourjelly.likebasketball.common.responseApi.ResponseApi;
 import com.sourjelly.likebasketball.user.domain.User;
@@ -30,6 +31,16 @@ public class ClubRestController {
             return ResponseEntity.ok(ResponseApi.success("성공"));
         }
         return ResponseEntity.ok(ResponseApi.fail("실패"));
+    }
+
+
+    @PostMapping("/club/update")
+    public ResponseEntity<ResponseApi<UpdateClubDto>> updateClubInfo(
+            @ModelAttribute UpdateClubDto updateClubDto
+    ){
+
+
+        return ResponseEntity.ok(ResponseApi.success("성공", updateClubDto));
     }
 
 

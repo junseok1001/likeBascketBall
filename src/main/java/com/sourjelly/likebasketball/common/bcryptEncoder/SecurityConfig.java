@@ -25,7 +25,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // 초기 개발 시 편리함을 위해 CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
                         // 콜백 주소는 누구나 접근 가능해야 합니다.
-                        .requestMatchers("/", "/user/kakao/callback", "/user/**").permitAll()
+                        .requestMatchers("/", "/user/kakao/callback", "/user/**", "/images/**", "/club/**").permitAll()
                         .anyRequest().permitAll() // 모든인증 허용
                         //.anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요
                 )

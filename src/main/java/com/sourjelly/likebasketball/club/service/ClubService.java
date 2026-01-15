@@ -3,6 +3,7 @@ package com.sourjelly.likebasketball.club.service;
 
 import com.sourjelly.likebasketball.club.domain.Club;
 import com.sourjelly.likebasketball.club.domain.ClubPhoto;
+import com.sourjelly.likebasketball.club.dto.ClubActivePhoto;
 import com.sourjelly.likebasketball.club.dto.MakeClubDto;
 import com.sourjelly.likebasketball.club.dto.ShowClubDto;
 import com.sourjelly.likebasketball.club.repository.ClubMemberRepository;
@@ -32,15 +33,16 @@ public class ClubService {
     private final ClubPhotoRepository clubPhotoRepository;
     private final PasswordEncoder passwordEncoder;
 
-
+    //클럽 만들기
     public boolean creatClub(
             MakeClubDto makeClubDto
             , User user){
 
         String encodingPassword = passwordEncoder.encode(makeClubDto.getPassword());
-        List<String> filesPath = FileManger.saveFiles(user.getId(), makeClubDto.getImagePath());
+        List<String> filesPath = FileManger.saveFiles(user.getId(), makeClubDto.getImages());
+        String profileImage = FileManger.saveProfile(user.getId(), makeClubDto.getProfileImage());
         try{
-            Club newClub = makeClubDto.toEntity(user, encodingPassword);
+            Club newClub = makeClubDto.toEntity(user, encodingPassword, profileImage);
             Club club = clubRepository.save(newClub);
             long clubId = club.getId();
 
@@ -68,21 +70,31 @@ public class ClubService {
         for(Club showClub : clubList){
             List<ClubPhoto> clubPhotoList = clubPhotoRepository.findById(showClub.getId());
 
-            List<String> imagePaths = new ArrayList<>();
+            List<ClubActivePhoto> clubActivePhotoList  = new ArrayList<>();
             for(ClubPhoto clubPhoto : clubPhotoList){
-                imagePaths.add(clubPhoto.getImagePath());
+                clubActivePhotoList.add(ClubActivePhoto.builder()
+                                                                .id(clubPhoto.getId())
+                                                                .imagePath(clubPhoto.getImagePath())
+                                                                .build());
+
             }
             showClubDtoList.add(ShowClubDto.builder()
+                    .Id(showClub.getId())
                     .clubName(showClub.getClubName())
                     .meetingDay(showClub.getMeetingDay())
                     .meetingTime(showClub.getMeetingTime())
                     .activityArea(showClub.getActivityArea())
                     .introduce(showClub.getIntroduce())
                     .phoneNumber(showClub.getPhoneNumber())
-                    .imagePath(imagePaths).build());
+                    .clubActivePhoto(clubActivePhotoList)
+                    .profileImage(showClub.getProfileImage())
+                    .build());
+
         }
         return showClubDtoList;
     }
+
+
 
 
 }

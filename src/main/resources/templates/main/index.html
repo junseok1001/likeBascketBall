@@ -44,7 +44,7 @@
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
                                 <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
-                                <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}"><li><a class="dropdown-item" href="/club/detail">동호회 관리</a></li></th:block>
+                                <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}"><li><a class="dropdown-item" href="/club/info">동호회 관리</a></li></th:block>
                             </ul>
                         </div>
                     </th:block>
@@ -72,18 +72,16 @@
                 <p class="text-muted">함께 농구를 즐길 동료들을 찾아보세요</p>
             </div>
             <div class="row g-4">
-                <div class="col-md-3">
-                    <div class="card club-card border-0 shadow-sm h-100">
-                        <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500" class="card-img-top" alt="club">
+                <div th:each="club :${clubs}" class="col-md-3">
+                    <div th:value="${club.id}" class="card club-card border-0 shadow-sm h-100">
+                        <img th:src="${club.profileImage}" src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500" width="500" class="card-img-top" alt="club">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="fw-bold mb-0">서울 슬램덩크</h5>
-                                <span class="badge badge-level">중급</span>
+                                <h5 th:text="${club.clubName}" class="fw-bold mb-0">서울 슬램덩크</h5>
                             </div>
                             <div class="club-info text-muted mb-3">
-                                <p><i class="fas fa-map-marker-alt"></i> 서울 강남구</p>
-                                <p><i class="fas fa-users"></i> 회원 24명</p>
-                                <p><i class="far fa-clock"></i> 토요일 19:00</p>
+                                <p th:text="${club.activityArea}"><i class="fas fa-map-marker-alt"></i> 서울 강남구</p>
+                                <p th:text="${club.meetingDay} + ' '+ ${club.meetingTime}"><i class="far fa-clock"></i> 토요일 19:00</p>
                             </div>
                             <button class="btn btn-dark w-100 fw-bold">가입 신청</button>
                         </div>
@@ -95,7 +93,6 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h5 class="fw-bold mb-0">부산 비스트</h5>
-                                <span class="badge badge-level high">고급</span>
                             </div>
                             <div class="club-info text-muted mb-3">
                                 <p><i class="fas fa-map-marker-alt"></i> 부산 해운대구</p>

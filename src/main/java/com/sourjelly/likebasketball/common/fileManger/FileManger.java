@@ -12,7 +12,8 @@ import java.util.List;
 
 public class FileManger {
 
-    public final static String FILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload";
+    public final static String FILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload\\clubDetailPhoto";
+    public final static String PROFILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload\\clubProfile";
 
     public static String saveFile(long userId, MultipartFile file){
 
@@ -23,6 +24,42 @@ public class FileManger {
         String directoryName = "/" + userId + "_" + System.currentTimeMillis();
 
         String directoryPath = FILE_UPLOAD_PATH + directoryName;
+
+        File directory = new File(directoryPath);
+
+        if (!directory.mkdir()) {
+            // 파일 생성 실패
+            return null;
+        }
+
+        String filePath = directoryPath + "/" + file.getOriginalFilename();
+        File filePart = new File(filePath);
+
+        try{
+            // 경로를 관리하는 객체 + file write를 같이 내부적으로 해준다.
+            file.transferTo(filePart);
+
+//            // 파일경로를 관리하는 객체
+//            Path path = Paths.get(filePath);
+//            //
+//            Files.write(path, bytes);
+        }catch(IOException e){
+            return null;
+        }
+
+
+        return "/images" + directoryName + "/" + file.getOriginalFilename();
+    }
+
+    public static String saveProfile(long userId, MultipartFile file){
+
+        if(file == null){
+            return null;
+        }
+
+        String directoryName = "/" + userId + "_" + System.currentTimeMillis();
+
+        String directoryPath = PROFILE_UPLOAD_PATH + directoryName;
 
         File directory = new File(directoryPath);
 
@@ -63,6 +100,31 @@ public class FileManger {
             }
         }
         return fileUrls;
+    }
+
+    public static boolean removeFile(String imagePath){
+        // image넣는게 필수가 아니여서
+        // image 경로가 null 이라면 false 기능수행 정지
+        if(imagePath == null){
+            return false;
+        }
+        //원본 file 이름으로 바꾸기
+        String fullFilePath = FILE_UPLOAD_PATH + imagePath.replace("/images", "");
+
+        // 파일 경로를 관리해주는 객체
+        Path path = Paths.get(fullFilePath);
+        // 해당 directory의 부모 directory 가져오기
+        Path directoryPath = path.getParent();
+
+        try {
+            Files.delete(path);
+            Files.delete(directoryPath);
+        } catch (IOException e) {
+            return false;
+        }
+
+        return true;
+
     }
 
 }

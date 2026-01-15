@@ -1,160 +1,66 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basketball Hub - 동호회 관리</title>
+    <title>Basketball Hub - 동호회 상세</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
     <style>
-        :root {
-            --primary-orange: #f08c55;
-            --bg-light: #f8f9fa;
-        }
+        :root { --primary-orange: #f37321; }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; }
 
-        body {
-            background-color: var(--bg-light);
-            padding-top: 80px; /* navbar fixed height margin */
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-        }
+        /* 네비게이션 바 (기본 스타일 유지) */
+        .main-nav { background: white; border-bottom: 1px solid #eee; }
+        .nav-auth-link { color: #333; text-decoration: none; font-size: 0.9rem; }
+        .btn-orange { background-color: var(--primary-orange); border: none; color: white; }
+        .btn-orange:hover { background-color: #d65f10; color: white; }
 
-        /* Navbar Custom */
-        .main-nav {
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .nav-auth-link {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-        }
-        .btn-orange {
-            background-color: var(--primary-orange);
-            border: none;
-        }
-        .btn-orange:hover {
-            background-color: #e67e45;
-        }
+        /* 동호회 상세 섹션 스타일 */
+        .club-detail-container { margin-top: 100px; margin-bottom: 50px; }
+        .main-club-img-wrapper { width: 100%; border-radius: 12px; overflow: hidden; height: 400px; }
+        .main-club-img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Main Content Layout */
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 30px;
+        .thumb-img {
+            width: 100%; border-radius: 8px; cursor: pointer; height: 85px;
+            object-fit: cover; border: 2px solid transparent; transition: 0.2s;
         }
+        .thumb-img:hover { opacity: 0.8; }
+        .thumb-img.active { border-color: var(--primary-orange); }
 
-        .section-title {
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
+        .info-card { background: white; border-radius: 15px; padding: 25px; border: none; }
+        .info-item { display: flex; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px; }
+        .info-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-right: 15px; }
 
-        /* Sidebar Stats Cards */
-        .stat-card {
-            border: none;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
-        .stat-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            color: white;
-            font-size: 1.2rem;
-        }
-        .stat-content .label {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 0;
-        }
-        .stat-content .value {
-            font-weight: 700;
-            font-size: 1.25rem;
-            margin-bottom: 0;
-        }
+        /* 아이콘별 배경색 */
+        .bg-user { background-color: #fff0e6; color: #f37321; }
+        .bg-cal { background-color: #e7f0ff; color: #0d6efd; }
+        .bg-money { background-color: #e7f5ea; color: #198754; }
+        .bg-phone { background-color: #f3e8ff; color: #8b5cf6; }
 
-        /* Form Card */
-        .content-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-        }
-
-        .form-label {
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-        }
-        .form-label .required {
-            color: #ff4d4f;
-            margin-left: 3px;
-        }
-
-        /* 입력창 상태 관리 CSS */
-        .form-control:disabled, .form-select:disabled {
-            background-color: #f4f6f8 !important; /* 수정 불가 시 회색 배경 */
-            border: 1px solid #eee !important;
-            color: #666;
-            cursor: default;
-        }
-
-        .form-control, .form-select {
-            background-color: #ffffff;
-            border: 1px solid var(--primary-orange); /* 수정 가능 시 오렌지색 테두리 */
-            padding: 12px 15px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .quick-menu-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 0;
-            color: #555;
-            text-decoration: none;
-            font-size: 0.95rem;
-        }
-        .quick-menu-item i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .char-count {
-            text-align: right;
-            font-size: 0.8rem;
-            color: #999;
-            margin-top: 5px;
-        }
+        .intro-section { background: white; border-radius: 15px; padding: 30px; margin-top: 25px; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg fixed-top main-nav">
+<nav class="navbar navbar-expand-lg fixed-top main-nav shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="#">
+        <a class="navbar-brand fw-bold" href="/main">
             <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" alt="logo" width="30" class="me-2"> Basketball Hub
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto fw-medium">
-                <li class="nav-item"><a class="nav-link active" href="#home">홈</a></li>
-                <li class="nav-item"><a class="nav-link" href="#clubs">동호회모집</a></li>
-                <li class="nav-item"><a class="nav-link" href="#shop">농구용품샵</a></li>
-                <li class="nav-item"><a class="nav-link" href="#matches">친선경기신청</a></li>
-                <li class="nav-item"><a class="nav-link" href="#rankings">경기결과/랭킹</a></li>
-                <li class="nav-item"><a class="nav-link" href="#board">자유게시판</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">홈</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">동호회모집</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">농구용품샵</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">친선경기신청</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">경기결과/랭킹</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">자유게시판</a></li>
             </ul>
             <div class="d-flex align-items-center gap-3">
                 <th:block th:if="${session.user == null}">
@@ -164,14 +70,12 @@
                 <th:block th:unless="${session.user== null}">
                     <div class="dropdown">
                         <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-fill nav-auth-link fs-4"></i>
+                            <i class="bi bi-person-fill  nav-auth-link fs-4"></i>
                         </button>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
                             <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
-                            <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}">
-                                <li><a class="dropdown-item" href="#">동호회 관리</a></li>
-                            </th:block>
+                            <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}"><li><a class="dropdown-item" href="/club/info">동호회 관리</a></li></th:block>
                         </ul>
                     </div>
                 </th:block>
@@ -180,134 +84,101 @@
     </div>
 </nav>
 
-<div class="container mt-4">
-    <div class="admin-header">
-        <div>
-            <h2 class="section-title">동호회 관리</h2>
-            <p class="text-muted mb-0">동호회 정보를 수정하고 회원을 관리하세요</p>
+<main class="container club-detail-container">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="main-club-img-wrapper mb-3 shadow-sm">
+                <img id="mainImage" src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1000" class="main-club-img" alt="대표 이미지">
+            </div>
+            <div class="row g-2 gallery-thumbs">
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500" class="thumb-img active"></div>
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1519861531473-9200362f46b3?w=500" class="thumb-img"></div>
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=500" class="thumb-img"></div>
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1511886929837-354d827aae26?w=500" class="thumb-img"></div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="info-card shadow-sm">
+                <div class="d-flex align-items-center mb-4">
+                    <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" width="45" class="me-3">
+                    <div>
+                        <h3 class="fw-bold mb-0">서울 슬램덩크</h3>
+                        <span class="text-muted small"><i class="bi bi-geo-alt-fill"></i> 서울 강남구</span>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon bg-user"><i class="bi bi-people-fill"></i></div>
+                    <div>
+                        <div class="text-muted small">현재 회원</div>
+                        <div class="fw-bold">24명</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon bg-cal"><i class="bi bi-calendar-check-fill"></i></div>
+                    <div>
+                        <div class="text-muted small">정기 모임</div>
+                        <div class="fw-bold">토요일 19:00 - 21:00</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon bg-money"><i class="bi bi-wallet2"></i></div>
+                    <div>
+                        <div class="text-muted small">회비</div>
+                        <div class="fw-bold">월 30,000원 (코트 대관료 포함)</div>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon bg-phone"><i class="bi bi-telephone-fill"></i></div>
+                    <div>
+                        <div class="text-muted small">연락처</div>
+                        <div class="fw-bold">010-1234-5678</div>
+                    </div>
+                </div>
+
+                <button id="applyBtn" class="btn btn-orange w-100 py-3 fw-bold mt-3 shadow">
+                    <i class="bi bi-person-plus-fill me-2"></i> 가입 신청하기
+                </button>
+            </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-lg-4">
-            <div class="content-card mb-4">
-                <h5 class="fw-bold mb-4">동호회 현황</h5>
-
-                <div class="stat-card" style="background-color: #fff8f1;">
-                    <div class="stat-icon" style="background-color: #f08c55;">
-                        <i class="bi bi-people"></i>
-                    </div>
-                    <div class="stat-content">
-                        <p class="label">현재 회원</p>
-                        <p class="value">24명</p>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="content-card">
-                <h5 class="fw-bold mb-3">빠른 메뉴</h5>
-                <div class="list-group list-group-flush">
-                    <a href="#" class="quick-menu-item"><i class="bi bi-trophy"></i> 친선경기 신청</a>
-                    <a href="#" class="quick-menu-item"><i class="bi bi-pencil-square"></i> 공지사항 작성</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-8">
-            <div class="content-card">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold mb-0">동호회 정보 수정</h5>
-                    <button type="button" id="editBtn" class="btn btn-orange text-white px-4">
-                        <i class="bi bi-pencil-fill me-2"></i> 수정하기
-                    </button>
-                </div>
-
-                <form id="clubForm">
-                    <div class="mb-4">
-                        <label class="form-label">동호회 이름 <span class="required">*</span></label>
-                        <input type="text" class="form-control" value="서울 슬램덩크" disabled>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label">활동 지역 <span class="required">*</span></label>
-                        <input type="text" class="form-control" value="서울 강남구" disabled>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">정기 모임 요일 <span class="required">*</span></label>
-                            <select class="form-select" disabled>
-                                <option>월요일</option>
-                                <option>화요일</option>
-                                <option>수요일</option>
-                                <option>목요일</option>
-                                <option>금요일</option>
-                                <option>토요일</option>
-                                <option>일요일</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">정기 모임 시간 <span class="required">*</span></label>
-                            <input type="text" class="form-control" value="19:00 - 21:00" disabled>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label">동호회 소개 <span class="required">*</span></label>
-                        <textarea class="form-control" rows="4" disabled>매주 토요일 저녁에 모여서 농구를 즐기는 동호회입니다. 실력보다는 즐거운 분위기를 중요하게 생각하며, 친목을 다지는 것을 목표로 하고 있습니다.</textarea>
-                        <div class="char-count">80/500</div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="form-label">회비</label>
-                        <input type="text" class="form-control" value="월 30,000원 (코트 대관비 포함)" disabled>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label">연락처 <span class="required">*</span></label>
-                        <input type="text" class="form-control" value="010-1234-5678" disabled>
-                    </div>
-                </form>
+        <div class="col-12">
+            <div class="intro-section shadow-sm border">
+                <h5 class="fw-bold mb-4">동호회 소개</h5>
+                <p class="text-muted lh-lg mb-0">
+                    매주 토요일 저녁에 모여서 농구를 즐기는 동호회입니다. 실력보다는 즐거운 분위기를 중요하게 생각하며, 친목을 다지는 것을 목표로 하고 있습니다. 초보자부터 경력자까지 모두 환영합니다!
+                </p>
             </div>
         </div>
     </div>
-</div>
-
-<footer class="mt-5 py-4 text-center text-muted">
-    <p> 2026 Basketball Hub. All rights reserved.</p>
-</footer>
+</main>
 
 
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script>
     $(document).ready(function() {
-        // [수정하기] 버튼 클릭 시 동작
-        $('#editBtn').on('click', function() {
-            let $form = $('#clubForm');
-            let $inputs = $form.find('input, select, textarea');
-            let isEditing = $(this).hasClass('active-edit');
+        // 갤러리 이미지 클릭 시 메인 이미지 변경 기능
+        $('.thumb-img').on('click', function() {
+            const newSrc = $(this).attr('src');
+            $('#mainImage').attr('src', newSrc);
 
-            if (!isEditing) {
-                // 수정 모드 시작
-                $inputs.prop('disabled', false); // 잠금 해제
-                $(this).addClass('active-edit')
-                    .removeClass('btn-orange')
-                    .addClass('btn-success') // 버튼 색상 변경 (저장 느낌)
-                    .html('<i class="bi bi-check-lg me-2"></i> 저장하기');
+            // active 클래스 이동
+            $('.thumb-img').removeClass('active');
+            $(this).addClass('active');
+        });
 
-                $inputs.first().focus(); // 첫 번째 칸에 커서 이동
-            } else {
-                // 저장 처리 (알림 후 다시 잠금)
-                alert('수정된 정보가 저장되었습니다.');
-
-                $inputs.prop('disabled', true); // 다시 잠금
-                $(this).removeClass('active-edit')
-                    .removeClass('btn-success')
-                    .addClass('btn-orange')
-                    .html('<i class="bi bi-pencil-fill me-2"></i> 수정하기');
-            }
+        // 가입 신청 버튼 클릭 이벤트 예시
+        $('#applyBtn').on('click', function() {
+            alert('가입 신청이 완료되었습니다!');
         });
     });
 </script>

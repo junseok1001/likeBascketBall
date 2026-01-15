@@ -32,6 +32,7 @@ public class Club {
     private String introduce;
     private String phoneNumber;
     private String price;
+    private String profileImage;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
