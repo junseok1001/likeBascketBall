@@ -1,17 +1,12 @@
 package com.sourjelly.likebasketball.club.dto;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class UpdateClubDto {
+public class SelectClubDto {
 
     private long id;
     private String clubName;
@@ -22,6 +17,5 @@ public class UpdateClubDto {
     private String price;
     private String phoneNumber;
     private String password;
-
-    private MultipartFile profileImage;
+    private String profileImage;
 }

@@ -3,9 +3,7 @@ package com.sourjelly.likebasketball.club.service;
 
 import com.sourjelly.likebasketball.club.domain.Club;
 import com.sourjelly.likebasketball.club.domain.ClubPhoto;
-import com.sourjelly.likebasketball.club.dto.ClubActivePhoto;
-import com.sourjelly.likebasketball.club.dto.MakeClubDto;
-import com.sourjelly.likebasketball.club.dto.ShowClubDto;
+import com.sourjelly.likebasketball.club.dto.*;
 import com.sourjelly.likebasketball.club.repository.ClubMemberRepository;
 import com.sourjelly.likebasketball.club.repository.ClubPhotoRepository;
 import com.sourjelly.likebasketball.club.repository.ClubRepository;
@@ -22,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +36,8 @@ public class ClubService {
     public boolean creatClub(
             MakeClubDto makeClubDto
             , User user){
+
+
 
         String encodingPassword = passwordEncoder.encode(makeClubDto.getPassword());
         List<String> filesPath = FileManger.saveFiles(user.getId(), makeClubDto.getImages());
@@ -76,7 +77,6 @@ public class ClubService {
                                                                 .id(clubPhoto.getId())
                                                                 .imagePath(clubPhoto.getImagePath())
                                                                 .build());
-
             }
             showClubDtoList.add(ShowClubDto.builder()
                     .Id(showClub.getId())
@@ -93,6 +93,60 @@ public class ClubService {
         }
         return showClubDtoList;
     }
+
+    // userId로 내가 가지고있는 club찾기
+    public SelectClubDto findMyClub(long userId){
+        Optional<Club> optionalClub =clubRepository.findByUserId(userId);
+
+        if(optionalClub.isPresent()){
+            Club selectClub = optionalClub.get();
+            return SelectClubDto.builder()
+                    .id(selectClub.getId())
+                    .clubName(selectClub.getClubName())
+                    .activityArea(selectClub.getActivityArea())
+                    .meetingDay(selectClub.getMeetingDay())
+                    .meetingTime(selectClub.getMeetingTime())
+                    .introduce(selectClub.getIntroduce())
+                    .price(selectClub.getPrice()).phoneNumber(selectClub.getPhoneNumber())
+                    .profileImage(selectClub.getProfileImage())
+                    .build();
+        }else{
+            return null;
+        }
+    }
+
+    // clubId로 해당 club찾기
+    public SelectClubDto findClub(long clubId){
+        Optional<Club> optionalClub =clubRepository.findById(clubId);
+
+        if(optionalClub.isPresent()){
+            Club selectClub = optionalClub.get();
+            return SelectClubDto.builder()
+                        .id(selectClub.getId())
+                        .clubName(selectClub.getClubName())
+                        .activityArea(selectClub.getActivityArea())
+                        .meetingDay(selectClub.getMeetingDay())
+                        .meetingTime(selectClub.getMeetingTime())
+                        .introduce(selectClub.getIntroduce())
+                        .price(selectClub.getPrice()).phoneNumber(selectClub.getPhoneNumber())
+                        .profileImage(selectClub.getProfileImage())
+                        .build();
+        }else{
+            return null;
+        }
+    }
+
+    //club id로 가져온 정보 수정하기
+//    public boolean updateClub(UpdateClubDto updateClubDto){
+//
+//        if(updateClubDto.getProfileImage() == null){
+//            Club.builder().clubName()
+//        }
+//
+//    }
+
+
+
 
 
 

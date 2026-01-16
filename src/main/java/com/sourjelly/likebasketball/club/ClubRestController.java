@@ -35,12 +35,24 @@ public class ClubRestController {
 
 
     @PostMapping("/club/update")
-    public ResponseEntity<ResponseApi<UpdateClubDto>> updateClubInfo(
+    public ResponseEntity<ResponseApi<Void>> updateClubInfo(
             @ModelAttribute UpdateClubDto updateClubDto
     ){
+        log.info("가져오는값 : {}", updateClubDto.getId());
+        log.info("가져오는값 : {}", updateClubDto.getClubName());
+        log.info("가져오는값 : {}", updateClubDto.getActivityArea());
+        log.info("가져오는값 : {}", updateClubDto.getMeetingDay());
+        log.info("가져오는값 : {}", updateClubDto.getMeetingTime());
+        log.info("가져오는값 : {}", updateClubDto.getIntroduce());
+        log.info("가져오는값 : {}", updateClubDto.getPrice());
+        log.info("가져오는값 : {}", updateClubDto.getPhoneNumber());
+        log.info("가져오는값 : {}", updateClubDto.getPassword());
+        log.info("가져오는값 : {}", updateClubDto.getProfileImage());
 
 
-        return ResponseEntity.ok(ResponseApi.success("성공", updateClubDto));
+
+
+        return ResponseEntity.ok(ResponseApi.success("성공"));
     }
 
 

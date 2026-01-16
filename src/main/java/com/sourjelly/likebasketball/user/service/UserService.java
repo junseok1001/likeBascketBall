@@ -1,6 +1,8 @@
 package com.sourjelly.likebasketball.user.service;
 
 
+import com.sourjelly.likebasketball.club.dto.SelectClubDto;
+import com.sourjelly.likebasketball.club.service.ClubService;
 import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.domain.UserStatus;
 import com.sourjelly.likebasketball.user.dto.KakaoUserInfoDto;
@@ -156,4 +158,5 @@ public class UserService {
     public void upgradeUser(User user){
         userRepository.save(user);
     }
+
 }

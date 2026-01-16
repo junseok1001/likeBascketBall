@@ -131,12 +131,12 @@
                     </button>
                 </div>
 
-                <form id="clubForm" enctype="multipart/form-data">
-                    <div class="mb-4">
+                <form id="clubForm"  enctype="multipart/form-data">
+                    <div id="UpdateClub" th:data-clubId="${club.id}"  class="mb-4">
                         <label class="form-label">동호회 프로필 사진</label>
                         <div class="profile-section">
                             <div class="profile-wrapper">
-                                <img src="https://cdn-icons-png.flaticon.com/512/711/711769.png" id="profilePreview" alt="Profile">
+                                <img th:src="${club.profileImage}" id="profilePreview" alt="Profile">
                                 <div id="delProfileBtn" class="del-badge"><i class="bi bi-x"></i></div>
                             </div>
 
@@ -147,53 +147,52 @@
                                 <p class="small text-muted mt-2 mb-0">JPG, PNG 파일 (최대 5MB)</p>
                                 <input type="file" id="profileInput" name="profileImage" class="d-none" accept="image/*">
 
-                                <input type="hidden" name="deleteProfileFlag" id="deleteProfileFlag" value="false">
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label">동호회 이름 <span class="required">*</span></label>
-                        <input type="text" name="clubName" class="form-control" value="서울 슬램덩크" disabled>
+                        <input th:value="${club.clubName}" type="text" name="clubName" class="form-control" value="서울 슬램덩크" disabled>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label">활동 지역 <span class="required">*</span></label>
-                        <input type="text" name="location" class="form-control" value="서울 강남구" disabled>
+                        <input th:value="${club.activityArea}" type="text" name="location" class="form-control" value="서울 강남구" disabled>
                     </div>
 
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <label class="form-label">정기 모임 요일 <span class="required">*</span></label>
                             <select name="meetingDay" class="form-select" disabled>
-                                <option>월요일</option>
-                                <option>화요일</option>
-                                <option>수요일</option>
-                                <option>목요일</option>
-                                <option>금요일</option>
-                                <option>토요일</option>
-                                <option>일요일</option>
+                                <option th:selected="${club.meetingDay == '월요일'}" >월요일</option>
+                                <option th:selected="${club.meetingDay == '화요일'}" >화요일</option>
+                                <option th:selected="${club.meetingDay == '수요일'}">수요일</option>
+                                <option th:selected="${club.meetingDay == '목요일'}">목요일</option>
+                                <option th:selected="${club.meetingDay == '금요일'}">금요일</option>
+                                <option th:selected="${club.meetingDay == '토요일'}">토요일</option>
+                                <option th:selected="${club.meetingDay == '일요일'}">일요일</option>
                             </select>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">정기 모임 시간 <span class="required">*</span></label>
-                            <input type="text" name="meetingTime" class="form-control" value="19:00 - 21:00" disabled>
+                            <input th:value="${club.meetingTime}" type="text" name="meetingTime" class="form-control" value="19:00 - 21:00" disabled>
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label">동호회 소개 <span class="required">*</span></label>
-                        <textarea name="introduce" class="form-control" rows="4" disabled>매주 토요일 저녁에 모여서 농구를 즐기는 동호회입니다.</textarea>
+                        <textarea th:text="${club.introduce}" name="introduce" class="form-control" rows="4" disabled>매주 토요일 저녁에 모여서 농구를 즐기는 동호회입니다.</textarea>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label">회비</label>
-                        <input type="text" name="fee" class="form-control" value="월 30,000원" disabled>
+                        <input th:value="${club.price}" type="text" name="fee" class="form-control" value="월 30,000원" disabled>
                     </div>
 
                     <div class="mb-2">
                         <label class="form-label">연락처 <span class="required">*</span></label>
-                        <input type="text" name="contact" class="form-control" value="010-1234-5678" disabled>
+                        <input th:Value="${club.phoneNumber}" type="text" name="contact" class="form-control" value="010-1234-5678" disabled>
                     </div>
                     <div class="p-4 mb-4" style="background-color: #fff9f4; border: 1px solid #ffe8d6; border-radius: 10px;">
                         <h6 class="fw-bold mb-3"><i class="bi bi-lock-fill me-1"></i> 동호회 가입 비밀번호</h6>
@@ -238,6 +237,7 @@
             } else {
                 // 저장 처리
                 let formData = new FormData();
+                let clubId = $("#UpdateClub").data("clubId");
                 let clubName = $("input[name='clubName']").val();
                 let location = $("input[name='location']").val();
                 let meetingDay = $("select[name='meetingDay']").val();
@@ -247,6 +247,8 @@
                 let contact = $("input[name='contact']").val();
                 let password = $("#passwordInput").val();
                 let pwConfirm = $("#passwordConfirmInput").val();
+
+                formData.append("id", clubId);
                 formData.append("clubName", clubName);
                 formData.append("activityArea", location);
                 formData.append("meetingDay", meetingDay);
@@ -255,8 +257,11 @@
                 formData.append("price", fee);
                 formData.append("phoneNumber", contact);
                 formData.append("password", password);
-                formData.append("profileImage", profileImage);
+                if(profileImage != null){
+                    formData.append("profileImage", profileImage);
+                }
 
+                console.log(clubId);
                 console.log("FormData 구성 완료 - 콘솔에서 확인 가능");
                 for (let pair of formData.entries()) {
                     console.log(pair[0] + ': ' + pair[1]);
@@ -284,8 +289,6 @@
                         alert("오류");
                     }
                 });
-
-                alert('수정 정보가 서버로 전송될 준비가 되었습니다.\n삭제 플래그: ' + $('#deleteProfileFlag').val());
 
                 // 화면 잠금 상태로 복구
                 $inputs.prop('disabled', true);
