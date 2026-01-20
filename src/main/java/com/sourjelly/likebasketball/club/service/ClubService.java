@@ -8,6 +8,8 @@ import com.sourjelly.likebasketball.club.repository.ClubMemberRepository;
 import com.sourjelly.likebasketball.club.repository.ClubPhotoRepository;
 import com.sourjelly.likebasketball.club.repository.ClubRepository;
 import com.sourjelly.likebasketball.common.fileManger.FileManger;
+import com.sourjelly.likebasketball.common.global.CustomException;
+import com.sourjelly.likebasketball.common.global.ErrorCode;
 import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.domain.UserStatus;
 import com.sourjelly.likebasketball.user.service.UserService;
@@ -137,13 +139,34 @@ public class ClubService {
     }
 
     //club id로 가져온 정보 수정하기
-//    public boolean updateClub(UpdateClubDto updateClubDto){
-//
-//        if(updateClubDto.getProfileImage() == null){
-//            Club.builder().clubName()
-//        }
-//
-//    }
+    public void updateClub(UpdateClubDto updateClubDto){
+
+        Club club = clubRepository.findById(updateClubDto.getId()).orElseThrow(() -> new CustomException(ErrorCode.CLUB_NOT_FOUND));
+
+            if (updateClubDto.getProfileImage() == null) {
+                Club updateClub = club.toBuilder().clubName(updateClubDto.getClubName())
+                                        .meetingTime(updateClubDto.getMeetingTime())
+                                        .meetingDay(updateClubDto.getMeetingDay())
+                                        .activityArea(updateClubDto.getActivityArea())
+                                        .introduce(updateClubDto.getIntroduce())
+                                        .phoneNumber(updateClubDto.getPhoneNumber())
+                                        .price(updateClubDto.getPrice()).build();
+                    clubRepository.save(updateClub);
+
+            } else {
+                FileManger.removeProfile(club.getProfileImage());
+                String imagePath = FileManger.saveProfile(club.getUserId(), updateClubDto.getProfileImage());
+
+                Club updateClub = club.toBuilder().clubName(updateClubDto.getClubName())
+                                                    .meetingTime(updateClubDto.getMeetingTime())
+                                                    .meetingDay(updateClubDto.getMeetingDay())
+                                                    .activityArea(updateClubDto.getActivityArea())
+                                                    .introduce(updateClubDto.getIntroduce())
+                                                    .phoneNumber(updateClubDto.getPhoneNumber())
+                                                    .price(updateClubDto.getPrice()).profileImage(imagePath).build();
+                clubRepository.save(updateClub);
+            }
+    }
 
 
 

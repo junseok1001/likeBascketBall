@@ -191,7 +191,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">정기 모임 요일<span>*</span></label>
-                                <select name="meetingDay" class="form-select">
+                                <select name="meetingDay" class="form-select" required>
                                     <option value="">선택해주세요</option>
                                     <option>월요일</option>
                                     <option>화요일</option>
@@ -204,13 +204,13 @@
                             </div>
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">정기 모임 시간<span>*</span></label>
-                                <input type="text" name="meetingTime" class="form-control" placeholder="예: 18:00 ~ 21:00">
+                                <input type="text" name="meetingTime" class="form-control" placeholder="예: 18:00 ~ 21:00" required>
                             </div>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">동호회 소개</label>
-                            <textarea name="content" class="form-control" rows="5" placeholder="동호회의 분위기, 활동 내용 등을 자유롭게 작성해주세요"></textarea>
+                            <textarea name="content" class="form-control" rows="5" placeholder="동호회의 분위기, 활동 내용 등을 자유롭게 작성해주세요" ></textarea>
                         </div>
 
                         <div class="p-4 mb-4" style="background-color: #fff9f4; border: 1px solid #ffe8d6; border-radius: 10px;">
@@ -218,23 +218,23 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="small fw-bold mb-1">비밀번호 <span>*</span></label>
-                                    <input type="password" id="passwordInput" class="form-control" placeholder="4자 이상 입력">
+                                    <input type="password" id="passwordInput" class="form-control" placeholder="4자 이상 입력" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="small fw-bold mb-1">비밀번호 확인 <span>*</span></label>
-                                    <input type="password" id="passwordConfirmInput" class="form-control" placeholder="비밀번호 재입력">
+                                    <input type="password" id="passwordConfirmInput" class="form-control" placeholder="비밀번호 재입력" required>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">회비</label>
-                            <input type="text" name="fee" class="form-control" placeholder="예: 월 20,000원">
+                            <input type="text" name="fee" class="form-control" placeholder="예: 월 20,000원" required>
                         </div>
 
                         <div class="mb-4">
                             <label class="form-label">연락처<span>*</span></label>
-                            <input type="text" name="contact" class="form-control" placeholder="전화번호 또는 카카오톡 ID">
+                            <input type="text" name="contact" class="form-control" placeholder="전화번호 또는 카카오톡 ID" required>
                         </div>
 
                         <div class="mb-5">
@@ -332,7 +332,7 @@
         };
 
 
-        // --- 주소 API ---
+        //  주소 API
         $("input[name='location']").on('click', function(){
             new daum.Postcode({
                 oncomplete : function(data){
@@ -343,7 +343,7 @@
         });
 
 
-        // --- AJAX 제출 로직 (주석 처리됨) ---
+        // AJAX 제출 로직 (주석 처리됨)
         $("#clubForm").on("submit", function(e){
             e.preventDefault();
 

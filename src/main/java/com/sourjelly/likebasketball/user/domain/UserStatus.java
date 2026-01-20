@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public enum UserStatus {
 
-    RENTER,
-    GENERAL,
-    CLUB_PERSISTENT
+    RENTER, // 대여자
+    GENERAL, // 일반 사용자
+    CLUB_PERSISTENT // 동호회장
 }

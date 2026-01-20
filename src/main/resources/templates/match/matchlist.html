@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>친선전 관리 - Basketball Hub</title>
+
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <style>
+        :root {
+            --main-orange: #E67E22;
+            --bg-body: #F9FAFB;
+            --dark-navy: #0A192F;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            padding-top: 80px;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 컨텐츠 영역 확장 */
+        .content-wrapper { flex: 1; }
+
+        /* 네비게이션 바 */
+        .main-nav { background: white; border-bottom: 1px solid #eee; }
+        .nav-auth-link { color: #333; text-decoration: none; font-size: 0.9rem; }
+
+        /* 버튼 */
+        .btn-orange { background-color: var(--main-orange); border: none; color: white; }
+        .btn-orange:hover { background-color: #D35400; color: white; }
+
+        /* 탭 커스텀 스타일 */
+        .nav-tabs .custom-tab {
+            color: #999;
+            border: none;
+            border-bottom: 3px solid transparent !important;
+            background: none;
+            transition: all 0.3s;
+        }
+        .nav-tabs .custom-tab.active {
+            color: var(--main-orange) !important;
+            border-bottom-color: var(--main-orange) !important;
+            background: none !important;
+        }
+
+        /* VS 아이콘 */
+        .vs-circle {
+            width: 50px; height: 50px;
+            background-color: var(--main-orange);
+            color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.1rem; margin-bottom: 8px;
+        }
+
+        /* 카드 및 레이아웃 */
+        .match-card { border-radius: 20px; overflow: hidden; }
+        .bg-orange-light { background-color: #FFF3E0; color: #E67E22; }
+        .bg-yellow-light { background-color: #FFFDE7; color: #FBC02D; }
+        .bg-blue-light { background-color: #E3F2FD; color: #1E88E5; }
+
+        .team-box-highlight { background-color: #F8F9FA; border-radius: 12px; }
+        .team-box-normal { background-color: #ffffff; border: 1px solid #f1f1f1; border-radius: 12px; }
+
+        /* 모달 상세 스타일 */
+        .modal-content { border-radius: 20px; border: none; }
+        .info-box { background-color: #F8F9FA; border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; }
+        .info-box i { font-size: 1.2rem; color: #6c757d; margin-right: 15px; }
+        .team-detail-card { background-color: #F8F9FA; border-radius: 15px; padding: 20px; text-align: center; height: 100%; }
+
+        /* 푸터 */
+        .footer { background: var(--dark-navy); color: white; }
+        .footer .social-links i { font-size: 1.5rem; color: white; opacity: 0.6; transition: 0.3s; cursor: pointer; }
+        .footer .social-links i:hover { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg fixed-top main-nav">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" alt="logo" width="30" class="me-2"> Basketball Hub
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto fw-medium">
+                    <li class="nav-item"><a class="nav-link active" href="#home">홈</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#clubs">동호회모집</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#shop">농구용품샵</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#matches">친선경기신청</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#rankings">경기결과/랭킹</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#board">자유게시판</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <th:block th:if="${session.user == null}">
+                        <a href="/user/login" class="nav-auth-link">로그인</a>
+                        <a href="/user/join" class="btn btn-orange text-white px-4 fw-bold shadow-sm">회원가입</a>
+                    </th:block>
+                    <th:block th:unless="${session.user== null}">
+                        <div class="dropdown">
+                            <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-fill  nav-auth-link fs-4"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
+                                <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
+                                <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}"><li><a class="dropdown-item" th:href="|/club/info/${session.user.id}|">동호회 관리</a></li></th:block>
+                            </ul>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+<div class="content-wrapper">
+    <section class="container mt-4 py-5">
+        <div class="mb-4">
+            <h2 class="fw-bold">친선전 관리</h2>
+            <p class="text-secondary">동호회 친선전 신청 현황을 확인하세요</p>
+        </div>
+
+        <ul class="nav nav-tabs border-bottom mb-4" id="matchTab" role="tablist">
+            <li class="nav-item flex-fill text-center">
+                <button class="nav-link active w-100 py-3 fw-bold custom-tab" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button">받은 신청 <span>(2)</span></button>
+            </li>
+            <li class="nav-item flex-fill text-center">
+                <button class="nav-link w-100 py-3 fw-bold custom-tab" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" type="button">보낸 신청 <span>(2)</span></button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="matchTabContent">
+            <div class="tab-pane fade show active" id="received" role="tabpanel">
+                <div class="card match-card border-0 shadow-sm p-4 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="badge rounded-pill bg-orange-light me-1 px-3 py-2">친선경기</span>
+                            <span class="badge rounded-pill bg-yellow-light px-3 py-2">대기중</span>
+                        </div>
+                        <a href="#" class="text-decoration-none text-muted small fw-bold" data-bs-toggle="modal" data-bs-target="#detailModal">상세보기 <i class="bi bi-arrow-right"></i></a>
+                    </div>
+
+                    <div class="row align-items-center text-center py-3">
+                        <div class="col-md-5">
+                            <div class="team-box-highlight p-4">
+                                <img src="https://via.placeholder.com/70/003366/FFFFFF?text=Thunder" class="rounded-circle mb-3 shadow-sm" alt="logo">
+                                <h5 class="fw-bold mb-1">인천 썬더스</h5>
+                                <div class="small text-danger fw-bold">승률: 72.5%</div>
+                                <div class="small text-muted">회원: 18명</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 my-4 my-md-0 d-flex flex-column align-items-center justify-content-center">
+                            <div class="vs-circle">VS</div>
+                            <div class="small text-muted">2025-02-15</div>
+                            <div class="fw-bold">19:00</div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="team-box-normal p-4">
+                                <img src="https://via.placeholder.com/70/FFCC00/000000?text=Slam" class="rounded-circle mb-3 shadow-sm" alt="logo">
+                                <h5 class="fw-bold mb-1">서울 슬램덩크</h5>
+                                <div class="small text-danger fw-bold">승률: 68.3%</div>
+                                <div class="small text-muted">회원: 24명</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-light p-3 rounded-3 mb-4 d-flex align-items-center">
+                        <i class="bi bi-geo-alt-fill text-secondary me-3 fs-5"></i>
+                        <div>
+                            <div class="fw-bold small">인천 체육관</div>
+                            <div class="text-muted small">인천시 남동구 예술로 156</div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button type="button" class="btn btn-light w-100 py-3 fw-bold border shadow-sm text-secondary">거절하기</button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-orange w-100 py-3 fw-bold shadow-sm">수락하기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="sent" role="tabpanel">
+                <div class="card match-card border-0 shadow-sm p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="badge rounded-pill bg-orange-light me-1 px-3 py-2">연습경기</span>
+                            <span class="badge rounded-pill bg-blue-light px-3 py-2">수락 대기중</span>
+                        </div>
+                        <a href="#" class="text-decoration-none text-muted small fw-bold" data-bs-toggle="modal" data-bs-target="#detailModal">상세보기 <i class="bi bi-arrow-right"></i></a>
+                    </div>
+
+                    <div class="row align-items-center text-center py-3">
+                        <div class="col-md-5">
+                            <div class="p-4" style="background-color: #FFF9F2; border-radius: 12px;">
+                                <img src="https://via.placeholder.com/70/FFCC00/000000?text=Slam" class="rounded-circle mb-3 shadow-sm" alt="logo">
+                                <h5 class="fw-bold mb-1">서울 슬램덩크</h5>
+                                <div class="small text-danger fw-bold">승률: 68.3%</div>
+                                <div class="small text-muted">회원: 24명</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 my-4 my-md-0 d-flex flex-column align-items-center justify-content-center">
+                            <div class="vs-circle">VS</div>
+                            <div class="small text-muted">2025-02-20</div>
+                            <div class="fw-bold">18:00</div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="team-box-highlight p-4">
+                                <img src="https://via.placeholder.com/70/990000/FFFFFF?text=Beast" class="rounded-circle mb-3 shadow-sm" alt="logo">
+                                <h5 class="fw-bold mb-1">부산 비스트</h5>
+                                <div class="small text-danger fw-bold">승률: 75.8%</div>
+                                <div class="small text-muted">회원: 22명</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-light p-3 rounded-3 d-flex align-items-center">
+                        <i class="bi bi-geo-alt-fill text-secondary me-3 fs-5"></i>
+                        <div>
+                            <div class="fw-bold small">강남 스포츠센터</div>
+                            <div class="text-muted small">서울시 강남구 테헤란로 123</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow">
+            <div class="modal-header d-flex justify-content-between align-items-center px-4 pt-4 pb-2">
+                <h5 class="modal-title fw-bold">친선전 상세 정보</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-4">
+                    <span class="badge rounded-pill bg-orange-light me-1 px-3 py-2">연습경기</span>
+                    <span class="badge rounded-pill bg-blue-light px-3 py-2">수락 대기중</span>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="team-detail-card shadow-sm border">
+                            <img src="https://via.placeholder.com/60/FFCC00/000000?text=S" class="rounded-circle mb-2" alt="logo">
+                            <div class="fw-bold">서울 슬램덩크</div>
+                            <div class="small text-danger">승률: 68.3%</div>
+                            <div class="small text-muted">회원: 24명</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="team-detail-card shadow-sm border">
+                            <img src="https://via.placeholder.com/60/990000/FFFFFF?text=B" class="rounded-circle mb-2" alt="logo">
+                            <div class="fw-bold">부산 비스트</div>
+                            <div class="small text-danger">승률: 75.8%</div>
+                            <div class="small text-muted">회원: 22명</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box shadow-sm border">
+                    <i class="bi bi-calendar-event"></i>
+                    <div>
+                        <div class="small text-muted fw-bold">경기 일시</div>
+                        <div class="small">2025-02-20 18:00</div>
+                    </div>
+                </div>
+                <div class="info-box shadow-sm border">
+                    <i class="bi bi-geo-alt"></i>
+                    <div>
+                        <div class="small text-muted fw-bold">강남 스포츠센터</div>
+                        <div class="small text-muted">서울시 강남구 테헤란로 123</div>
+                    </div>
+                </div>
+                <div class="info-box shadow-sm border">
+                    <i class="bi bi-telephone"></i>
+                    <div>
+                        <div class="small text-muted fw-bold">연락처</div>
+                        <div class="small">010-1234-5678</div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="fw-bold mb-2">경기 설명</div>
+                    <div class="p-3 bg-light rounded-3 small text-muted">
+                        연습 경기를 통해 실력을 향상시키고 싶습니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer py-5 text-white">
+    <div class="container text-center">
+        <div class="social-links mb-3">
+            <i class="bi bi-instagram mx-2"></i>
+            <i class="bi bi-facebook mx-2"></i>
+            <i class="bi bi-youtube mx-2"></i>
+        </div>
+        <div class="opacity-50 small">
+            <p>© 2025 Basketball Hub. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // 탭 클릭 활성화
+        $('.custom-tab').on('click', function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+    });
+</script>
+
+</body>
+</html>

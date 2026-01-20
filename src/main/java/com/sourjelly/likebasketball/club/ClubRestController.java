@@ -48,11 +48,10 @@ public class ClubRestController {
         log.info("가져오는값 : {}", updateClubDto.getPhoneNumber());
         log.info("가져오는값 : {}", updateClubDto.getPassword());
         log.info("가져오는값 : {}", updateClubDto.getProfileImage());
-
-
-
+        clubService.updateClub(updateClubDto);
 
         return ResponseEntity.ok(ResponseApi.success("성공"));
+
     }
 
 

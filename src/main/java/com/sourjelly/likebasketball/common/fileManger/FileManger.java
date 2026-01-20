@@ -1,5 +1,6 @@
 package com.sourjelly.likebasketball.common.fileManger;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class FileManger {
 
     public final static String FILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload\\clubDetailPhoto";
@@ -110,6 +112,32 @@ public class FileManger {
         }
         //원본 file 이름으로 바꾸기
         String fullFilePath = FILE_UPLOAD_PATH + imagePath.replace("/images", "");
+
+        // 파일 경로를 관리해주는 객체
+        Path path = Paths.get(fullFilePath);
+        // 해당 directory의 부모 directory 가져오기
+        Path directoryPath = path.getParent();
+        log.info(directoryPath.toString());
+
+        try {
+            Files.delete(path);
+            Files.delete(directoryPath);
+        } catch (IOException e) {
+            return false;
+        }
+
+        return true;
+
+    }
+
+    public static boolean removeProfile(String imagePath){
+        // image넣는게 필수가 아니여서
+        // image 경로가 null 이라면 false 기능수행 정지
+        if(imagePath == null){
+            return false;
+        }
+        //원본 file 이름으로 바꾸기
+        String fullFilePath = PROFILE_UPLOAD_PATH + imagePath.replace("/images", "");
 
         // 파일 경로를 관리해주는 객체
         Path path = Paths.get(fullFilePath);

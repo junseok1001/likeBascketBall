@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Basketball Hub - 동호회 관리</title>
+
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
@@ -132,7 +134,7 @@
                 </div>
 
                 <form id="clubForm"  enctype="multipart/form-data">
-                    <div id="UpdateClub" th:data-clubId="${club.id}"  class="mb-4">
+                    <div id="UpdateClub" th:data-clubid="${club.id}"  class="mb-4">
                         <label class="form-label">동호회 프로필 사진</label>
                         <div class="profile-section">
                             <div class="profile-wrapper">
@@ -247,6 +249,7 @@
                 let contact = $("input[name='contact']").val();
                 let password = $("#passwordInput").val();
                 let pwConfirm = $("#passwordConfirmInput").val();
+                console.log(clubId);
 
                 formData.append("id", clubId);
                 formData.append("clubName", clubName);
@@ -261,7 +264,7 @@
                     formData.append("profileImage", profileImage);
                 }
 
-                console.log(clubId);
+
                 console.log("FormData 구성 완료 - 콘솔에서 확인 가능");
                 for (let pair of formData.entries()) {
                     console.log(pair[0] + ': ' + pair[1]);
@@ -283,7 +286,13 @@
                     processData: false,
                     contentType: false,
                     success: function(response) {
-                        console.log(response);
+                        if(response.result === "success"){
+                            alert("수정이 완료되었습니다");
+                            window.location.reload();
+                        }else{
+                            alert("수정이 되었습니다");
+                        }
+
                     }
                     , error: function(){
                         alert("오류");
