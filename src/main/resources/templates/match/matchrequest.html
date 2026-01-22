@@ -249,6 +249,10 @@
                 , contentType: false
                 , success: function(response){
                     // console.log(response)
+                    if(response.result == "success"){
+                        alert("신청 완료되었습니다. 메인페이지로 넘어갑니다.");
+                        window.location.href="/main";
+                    }
                 }
                 , error: function(xhr){
                     // 서버에서 에러 메세지를 구성해서 하기

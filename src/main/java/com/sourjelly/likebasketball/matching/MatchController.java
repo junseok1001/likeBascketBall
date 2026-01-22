@@ -7,11 +7,13 @@ import com.sourjelly.likebasketball.common.global.CustomException;
 import com.sourjelly.likebasketball.common.global.ErrorCode;
 import com.sourjelly.likebasketball.common.global.GlobalExceptionHandler;
 import com.sourjelly.likebasketball.matching.dto.ClubInfo;
+import com.sourjelly.likebasketball.matching.dto.SendMatching;
 import com.sourjelly.likebasketball.matching.service.MatchingService;
 import com.sourjelly.likebasketball.user.domain.User;
 import jakarta.servlet.http.HttpSession;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/match")
 @RequiredArgsConstructor
@@ -29,8 +32,25 @@ public class MatchController {
     private final MatchingService matchingService;
 
     @GetMapping("/list")
-    public String matchList(){
+    public String matchList(HttpSession session, Model model){
 
+        User user = (User)session.getAttribute("user");
+
+        //interceptor 생기면 뺄거
+        if(user == null){
+            return "redirect:/main";
+        }
+
+
+
+        // 내 클럽 아이디를 입력받아 하기
+        // 받은 매칭 정보
+        List<SendMatching> incomeMatch =  matchingService.incomingMatch(user.getId());
+
+        List<SendMatching> applyMatch = matchingService.sentMatch(user.getId());
+
+        model.addAttribute("incomeMatch", incomeMatch);
+        model.addAttribute("applyMatch", applyMatch);
 
 
         return "/match/matchlist";
@@ -67,11 +87,16 @@ public class MatchController {
         return "/match/matchrequest";
     }
 
-//    @GetMapping("/detail/{matchId}")
-//    public String modalView(@PathVariable long matchId){
-//
-//
-//
-//        return
-//    }
+
+
+    // view는 아님
+    // api이지만 특이한 케이스 modal에서 만든 html를 내가 원하는곳에서 넣어야 되닌깐 문자열로 만드는것 **
+    @GetMapping("/detail/{matchId}")
+    public String modalView(@PathVariable long matchId){
+
+
+
+        return "fragments/matchModalContent :: matchDetail";
+    }
+
 }

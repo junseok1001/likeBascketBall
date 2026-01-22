@@ -1,6 +1,8 @@
 package com.sourjelly.likebasketball.matching.dto;
 
 import com.sourjelly.likebasketball.matching.domain.MatchStatus;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,6 +24,7 @@ public class SendMatching {
     private long matchingId;
     private LocalDate gameDate;
     private LocalTime gameTime;
+    @Enumerated(EnumType.STRING)
     private MatchStatus matchStatus;
     private String location;
     private String phoneNumber;
