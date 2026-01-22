@@ -23,16 +23,14 @@ public class MatchStart {
 //    let content = $("textarea[name='content']").val();
 //    let phoneNumber =$("#phoneNumberInput").val();
 
+    @NotNull(message="도전하는팀이 비었습니다.")
     private long challengeClubId;
-    @NotBlank(message="도전하는팀이 비었습니다.")
-    private String challengeClub;
+    @NotNull(message="어웨이팀이 비었습니다.")
     private long awayClubId;
-    @NotBlank(message="어웨이팀이 비었습니다.")
-    private String awayClub;
-    @NotNull(message="이거 뭐야?")
+    @NotNull(message="경기 날짜가 비어있습니다.")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate gameDate;
-    @NotNull(message="저건 뭐고?")
+    @NotNull(message="경기 시간이 비어있습니다.")
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime gameTime;
     @NotBlank

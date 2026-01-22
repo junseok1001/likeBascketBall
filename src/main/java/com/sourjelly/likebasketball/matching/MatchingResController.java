@@ -20,27 +20,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class MatchingResController {
 
     private final MatchingService matchingService;
+    // 매칭 신청하는 api
+    @PostMapping("/match")
+    public ResponseEntity<ResponseApi<Void>> matching(@Validated MatchStart matchStart){
 
-//    @PostMapping
-//    public ResponseEntity<ResponseApi<Void>> matching(@Validated MatchStart matchStart){
+        if(matchStart == null){
+            throw new CustomException(ErrorCode.NOT_DATA_IN_FIELD);
+        }
+
+        matchingService.matching(matchStart);
+
+
+        return ResponseEntity.ok(ResponseApi.success("성공"));
+    }
+        // 매칭 신청하는거 확인용 api
+//    @PostMapping("/match")
+//    public MatchStart matching(@Validated MatchStart matchStart){
 //
-//        if(matchStart == null){
-//            throw new CustomException(ErrorCode.NOT_DATA_IN_FIELD);
-//        }
-//
-//        matchingService.matching(matchStart);
-//
-//
-//        return ResponseEntity.ok(ResponseApi.success("성공"));
+//        return matchStart;
 //    }
 
-    @PostMapping("/match")
-    public MatchStart matching(@Validated MatchStart matchStart){
 
-        log.info("데이터 : {}", matchStart.getGameDate());
-        log.info("데이터 : {}", matchStart.getGameTime());
 
-        return matchStart;
-    }
 
 }

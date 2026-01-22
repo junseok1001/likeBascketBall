@@ -16,7 +16,7 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "`matching`")
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Matching {
@@ -37,7 +37,8 @@ public class Matching {
     private long challengeClub;
     private long awayClub;
     private LocalDate gameDate; // 이거가 중요
-    private LocalTime gameTime; // 이거 중요
+    private LocalTime gameTime;// 이거 중요
+    @Enumerated(EnumType.STRING)
     private MatchStatus matchStatus;
     private String location;
     private String content;
