@@ -42,4 +42,18 @@ public class MakeClubDto {
                 .build();
     }
 
+    public Club toEntity(User user, String encodingPassword){
+        return Club.builder()
+                .userId(user.getId())
+                .clubName(this.clubName)
+                .password(encodingPassword)
+                .meetingDay(this.meetingDay)
+                .meetingTime(this.meetingTime)
+                .activityArea(this.activityArea)
+                .introduce(this.introduce)
+                .phoneNumber(this.phoneNumber)
+                .price(this.price)
+                .build();
+    }
+
 }

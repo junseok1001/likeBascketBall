@@ -45,20 +45,28 @@ public class ClubService {
         List<String> filesPath = FileManger.saveFiles(user.getId(), makeClubDto.getImages());
         String profileImage = FileManger.saveProfile(user.getId(), makeClubDto.getProfileImage());
         try{
-            Club newClub = makeClubDto.toEntity(user, encodingPassword, profileImage);
-            Club club = clubRepository.save(newClub);
-            long clubId = club.getId();
+            if(makeClubDto.getProfileImage() != null) {
+                Club newClub = makeClubDto.toEntity(user, encodingPassword, profileImage);
+                Club club = clubRepository.save(newClub);
+                long clubId = club.getId();
 
-            for(String filePath : filesPath){
-                ClubPhoto clubPhoto = ClubPhoto.builder().clubId(clubId).imagePath(filePath).build();
-                clubPhotoRepository.save(clubPhoto);
+
+                for (String filePath : filesPath) {
+                    ClubPhoto clubPhoto = ClubPhoto.builder().clubId(clubId).imagePath(filePath).build();
+                    clubPhotoRepository.save(clubPhoto);
+                }
+            }else{
+                Club newClub = makeClubDto.toEntity(user, encodingPassword);
+                clubRepository.save(newClub);
             }
+
 
         }catch(DataAccessException e){
             // 생성 실패
             return false;
         }
         // 생성 완료
+
         User upgradeUser = user.toBuilder().userStatus(UserStatus.CLUB_PERSISTENT).build();
         userService.upgradeUser(upgradeUser);
         return true;

@@ -8,5 +8,7 @@ import java.util.List;
 
 @Repository
 public interface MatchingRepository extends JpaRepository<Matching, Long> {
+    public List<Matching> findByChallengeClub(long challengeClub);
+
     public List<Matching> findByAwayClub(long awayClub);
 }

@@ -40,6 +40,7 @@ public class Matching {
     private LocalTime gameTime;// 이거 중요
     @Enumerated(EnumType.STRING)
     private MatchStatus matchStatus;
+    private String locationName;
     private String location;
     private String content;
     private String phoneNumber;

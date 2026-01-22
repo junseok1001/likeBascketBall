@@ -26,6 +26,7 @@ public class SendMatching {
     private LocalTime gameTime;
     @Enumerated(EnumType.STRING)
     private MatchStatus matchStatus;
+    private String locationName;
     private String location;
     private String phoneNumber;
 }

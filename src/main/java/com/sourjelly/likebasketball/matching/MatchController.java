@@ -48,9 +48,12 @@ public class MatchController {
         List<SendMatching> incomeMatch =  matchingService.incomingMatch(user.getId());
 
         List<SendMatching> applyMatch = matchingService.sentMatch(user.getId());
-
+        //보낸거
         model.addAttribute("incomeMatch", incomeMatch);
+        model.addAttribute("come", applyMatch.size());
+        //받는거
         model.addAttribute("applyMatch", applyMatch);
+        model.addAttribute("send", incomeMatch.size());
 
 
         return "/match/matchlist";
