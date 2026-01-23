@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -33,12 +30,21 @@ public class MatchingResController {
 
         return ResponseEntity.ok(ResponseApi.success("성공"));
     }
-        // 매칭 신청하는거 확인용 api
-//    @PostMapping("/match")
-//    public MatchStart matching(@Validated MatchStart matchStart){
-//
-//        return matchStart;
-//    }
+
+    // 매칭 거절 기능
+    @PostMapping("/match/status")
+    public ResponseEntity<ResponseApi<Void>> rejectApi(@RequestParam long matchingId, @RequestParam String status){
+
+        if(matchingService.changeMatchStatus(matchingId, status)){
+            return ResponseEntity.ok(ResponseApi.success("거절기능 성공"));
+        }else{
+            throw new CustomException(ErrorCode.PARAMETER_NOT_FOUND);
+        }
+
+    }
+
+
+    // 매칭 수락 기능
 
 
 

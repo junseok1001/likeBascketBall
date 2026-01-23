@@ -8,6 +8,7 @@ import com.sourjelly.likebasketball.common.global.ErrorCode;
 import com.sourjelly.likebasketball.common.global.GlobalExceptionHandler;
 import com.sourjelly.likebasketball.matching.dto.ClubInfo;
 import com.sourjelly.likebasketball.matching.dto.SendMatching;
+import com.sourjelly.likebasketball.matching.dto.SendModalMatch;
 import com.sourjelly.likebasketball.matching.service.MatchingService;
 import com.sourjelly.likebasketball.user.domain.User;
 import jakarta.servlet.http.HttpSession;
@@ -42,7 +43,6 @@ public class MatchController {
         }
 
 
-
         // 내 클럽 아이디를 입력받아 하기
         // 받은 매칭 정보
         List<SendMatching> incomeMatch =  matchingService.incomingMatch(user.getId());
@@ -50,10 +50,10 @@ public class MatchController {
         List<SendMatching> applyMatch = matchingService.sentMatch(user.getId());
         //보낸거
         model.addAttribute("incomeMatch", incomeMatch);
-        model.addAttribute("come", applyMatch.size());
+        model.addAttribute("come", incomeMatch.size());
         //받는거
         model.addAttribute("applyMatch", applyMatch);
-        model.addAttribute("send", incomeMatch.size());
+        model.addAttribute("send", applyMatch.size());
 
 
         return "/match/matchlist";
@@ -95,11 +95,15 @@ public class MatchController {
     // view는 아님
     // api이지만 특이한 케이스 modal에서 만든 html를 내가 원하는곳에서 넣어야 되닌깐 문자열로 만드는것 **
     @GetMapping("/detail/{matchId}")
-    public String modalView(@PathVariable long matchId){
+    public String modalView(@PathVariable long matchId, Model model){
 
+            SendModalMatch modalMatch = matchingService.MatchingInfoByMatchingId(matchId);
 
-
+        model.addAttribute("matchingInfo", modalMatch );
+        // 요청 파일 :: fragment 명으로 파일 html 보내주기
         return "fragments/matchModalContent :: matchDetail";
     }
+
+
 
 }

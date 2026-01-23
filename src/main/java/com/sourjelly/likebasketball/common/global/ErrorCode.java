@@ -17,6 +17,7 @@ public enum ErrorCode {
     , INTERNAL_SERVER_ERROR(500, "서버에서 처리하는도중 오류가 났습니다.")
     , USER_NOT_FOUND(404, "유저를 찾을수 없습니다. 로그인 하세요")
     , NOT_DATA_IN_FIELD(404, "DTO가 비었습니다")
+    , NO_MATCHING(404, "경기를 찾을수 없습니다.");
     ;
 
     private final int status;

@@ -42,6 +42,15 @@
             margin-right: auto;
         }
 
+        /* 모달용 약간 작은 로고 */
+        .modal-team-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
         /* 컨텐츠 영역 확장 */
         .content-wrapper { flex: 1; }
 
@@ -97,6 +106,9 @@
         .footer { background: var(--dark-navy); color: white; }
         .footer .social-links i { font-size: 1.5rem; color: white; opacity: 0.6; transition: 0.3s; cursor: pointer; }
         .footer .social-links i:hover { opacity: 1; }
+    </style>
+    <style>
+
     </style>
 </head>
 <body>
@@ -158,9 +170,10 @@
         </ul>
 
         <div class="tab-content" id="matchTabContent" >
+            <!-- 받은 신청-->
             <!-- 상대클럽 정보 -->
-            <div th:each="matchingInfo : ${applyMatch}" class="tab-pane fade show active" id="received" role="tabpanel">
-                <div class="card match-card border-0 shadow-sm p-4 mb-3">
+            <div class="tab-pane fade show active" id="received" role="tabpanel">
+                <div th:each="matchingInfo : ${incomeMatch}" class="card match-card border-0 shadow-sm p-4 mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <span class="badge rounded-pill bg-orange-light me-1 px-3 py-2">친선경기</span>
@@ -168,7 +181,7 @@
                             <span th:if="${matchingInfo.matchStatus.name()== 'SUBMIT'}" class="badge rounded-pill bg-green-light px-3 py-2">수락</span>
                             <span  th:if="${matchingInfo.matchStatus.name()== 'REJECT'}"  class="badge rounded-pill bg-red-light px-3 py-2">거절</span>
                         </div>
-                        <a href="#" class="text-decoration-none text-muted small fw-bold" data-bs-toggle="modal" data-bs-target="#detailModal">
+                        <a href="#" th:data-match-id="${matchingInfo.matchingId}" class="modal-detail text-decoration-none text-muted small fw-bold" > <!--data-bs-toggle="modal" data-bs-target="#detailModal" 기존되는거 부트스트랩 문법 -->
                             상세보기
                             <i class="bi bi-arrow-right"></i>
                         </a>
@@ -209,25 +222,29 @@
 
                     <div class="row g-2">
                         <div class="col-6">
-                            <button type="button" class="btn btn-light w-100 py-3 fw-bold border shadow-sm text-secondary">거절하기</button>
+                            <button type="button" th:value="${matchingInfo.matchingId}" class="btn btn-light w-100 py-3 fw-bold border shadow-sm text-secondary">거절하기</button>
                         </div>
                         <div class="col-6">
-                            <button type="button" class="btn btn-orange w-100 py-3 fw-bold shadow-sm">수락하기</button>
+                            <button type="button" th:value="${matchingInfo.matchingId}"  class="btn btn-orange w-100 py-3 fw-bold shadow-sm">수락하기</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="tab-pane fade" id="sent" role="tabpanel">
-                <div th:each="clubInfo : ${incomeMatch}" class="card match-card border-0 shadow-sm p-4">
+                <div th:each="clubInfo : ${applyMatch}" class="card match-card border-0 shadow-sm p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <span class="badge rounded-pill bg-blue-light px-3 py-2">수락 대기중</span>
-                            <span class="badge rounded-pill bg-green-light px-3 py-2">수락</span>
-                            <span class="badge rounded-pill bg-red-light px-3 py-2">거절</span>
+                            <span th:if="${clubInfo.matchStatus.name()== 'WAITING'}" class="badge rounded-pill bg-blue-light px-3 py-2">수락 대기중</span>
+                            <span th:if="${clubInfo.matchStatus.name()== 'SUBMIT'}" class="badge rounded-pill bg-green-light px-3 py-2">수락</span>
+                            <span th:if="${clubInfo.matchStatus.name()== 'REJECT'}" class="badge rounded-pill bg-red-light px-3 py-2">거절</span>
                         </div>
-                        <a href="#" class="text-decoration-none text-muted small fw-bold" data-bs-toggle="modal" data-bs-target="#detailModal">상세보기 <i class="bi bi-arrow-right"></i></a>
+                        <a href="#" th:data-match-id="${clubInfo.matchingId}" class="modal-detail text-decoration-none text-muted small fw-bold"> <!--data-bs-toggle="modal" data-bs-target="#detailModal" 기존되는거 부트스트랩 문법 -->
+                            상세보기
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
                     </div>
+                    <!-- 보낸 신청 -->
                     <!-- 내 클럽 정보 -->
                     <div class="row align-items-center text-center py-3">
                         <div class="col-md-5">
@@ -263,6 +280,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </section>
 </div>
@@ -276,6 +294,7 @@
             </div>
             <div class="modal-body p-4">
                 <div class="text-center">데이터를 불러오는 중입니다...</div>
+
 <!--                <div class="mb-4">-->
 <!--                    <span class="badge rounded-pill bg-blue-light px-3 py-2" >수락 대기중</span>-->
 <!--                </div>-->
@@ -333,6 +352,31 @@
         $('.custom-tab').on('click', function (e) {
             e.preventDefault();
             $(this).tab('show');
+        });
+
+        $(".modal-detail").click(function(e){
+            e.preventDefault();
+            let matchId = $(this).data("match-id");
+                // console.log(matchId);
+
+            $.ajax({
+                type:"get"
+                , url : "/match/detail/" + matchId
+                , success: function(response){
+                    $('#detailModal .modal-body').html(response);
+
+                    // 2. 부트스트랩 모달 띄우기
+                    // bootstrap 5.0 부터는 jquery 의존성을 버릴려고 modal 생성 할때 순수 js를 쓰도록 변함
+                    // 그래서 순수 자바 문법으로 가져옴
+                    let myModal = new bootstrap.Modal(document.getElementById('detailModal'));
+                    myModal.show();
+                }
+                , error: function(){
+                    alert("상세정보를 전달하지 못했습니다. 관리자한테 문의 하세요");
+                }
+
+            });
+
         });
 
 
