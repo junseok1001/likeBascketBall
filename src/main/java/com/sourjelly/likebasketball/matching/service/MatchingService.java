@@ -158,10 +158,21 @@ public class MatchingService {
 
 
         if(status.equals("submit")){
-            matching.toBuilder().matchStatus(MatchStatus.SUBMIT).build();
+            // db 사용 빈도수 줄이기
+            if(matching.getMatchStatus().equals(MatchStatus.SUBMIT)){
+                throw new CustomException(ErrorCode.ALREADY_SUBMIT);
+            }
+            Matching updateStatusMatching = matching.toBuilder().matchStatus(MatchStatus.SUBMIT).build();
+            matchingRepository.save(updateStatusMatching);
             return true;
         }else if(status.equals("reject")){
-            matching.toBuilder().matchStatus(MatchStatus.REJECT).build();
+            //DB 사용 빈도수 줄이기
+            if(matching.getMatchStatus().equals(MatchStatus.REJECT)){
+                throw new CustomException(ErrorCode.ALREADY_REJECT);
+            }
+
+            Matching updateStatusMatching = matching.toBuilder().matchStatus(MatchStatus.REJECT).build();
+            matchingRepository.save(updateStatusMatching);
             return true;
         }
 

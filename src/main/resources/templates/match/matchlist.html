@@ -222,15 +222,15 @@
 
                     <div class="row g-2">
                         <div class="col-6">
-                            <button type="button" th:value="${matchingInfo.matchingId}" class="btn btn-light w-100 py-3 fw-bold border shadow-sm text-secondary">거절하기</button>
+                            <button type="button" th:value="${matchingInfo.matchingId}" class="reject-btn btn btn-light w-100 py-3 fw-bold border shadow-sm text-secondary">거절하기</button>
                         </div>
                         <div class="col-6">
-                            <button type="button" th:value="${matchingInfo.matchingId}"  class="btn btn-orange w-100 py-3 fw-bold shadow-sm">수락하기</button>
+                            <button type="button" th:value="${matchingInfo.matchingId}"  class="submit-btn btn btn-orange w-100 py-3 fw-bold shadow-sm">수락하기</button>
                         </div>
                     </div>
                 </div>
             </div>
-
+            <!-- 보낸 신청 탭 -->
             <div class="tab-pane fade" id="sent" role="tabpanel">
                 <div th:each="clubInfo : ${applyMatch}" class="card match-card border-0 shadow-sm p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -376,6 +376,82 @@
                 }
 
             });
+
+        });
+
+        $(".reject-btn").on("click", function(){
+            let matchId = $(this).val();
+            let status = "reject";
+
+            console.log(matchId + "\n" + status);
+
+            $.ajax({
+                type : "post"
+                , url : "/match/status"
+                , data : {"matchingId": matchId, "status": status}
+                , success: function(response){
+                    if(response.result === "success"){
+                        location.reload();
+                    }else if(response.status === 202) {
+                        console.log(response.message);
+                        alert(response.message);
+                    }
+                    // if(response){
+                    //     location.reload();
+                    // }
+                    console.log(response);
+                }
+                , error : function(xhr){
+
+                    if(xhr.responseJSON.status === 404) {
+                        console.log(xhr.responseJSON.status);
+                        alert(xhr.responseJSON.message);
+                    }else if(xhr.responseJSON.status === 202){
+                        console.log(xhr.responseJSON.status);
+                        alert(xhr.responseJSON.message);
+                    }
+
+
+                }
+            });
+
+        });
+
+        $(".submit-btn").on("click", function(){
+            let matchId = $(this).val();
+            let status = "submit";
+
+            console.log(matchId + "\n" + status);
+
+            $.ajax({
+                type : "post"
+                , url : "/match/status"
+                , data : {"matchingId": matchId, "status": status}
+                , success: function(response){
+                    if(response.result === "success"){
+                        location.reload();
+                    }else if(response.status === 202){
+                        console.log(response.message);
+                        alert(response.message);
+                    }
+                    // if(response){
+                    //     location.reload();
+                    // }
+                    console.log(response);
+                }
+                , error : function(xhr){
+
+                    if(xhr.responseJSON.status === 404) {
+                        console.log(xhr.responseJSON.status);
+                        alert(xhr.responseJSON.message);
+                    }else if(xhr.responseJSON.status === 202){
+                        console.log(xhr.responseJSON.status);
+                        alert(xhr.responseJSON.message);
+                    }
+
+                }
+            });
+
 
         });
 

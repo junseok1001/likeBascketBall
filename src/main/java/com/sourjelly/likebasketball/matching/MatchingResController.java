@@ -32,11 +32,12 @@ public class MatchingResController {
     }
 
     // 매칭 거절 기능
+    // 기능을 두개를 따로 만들어야 되나??? api로 확장성으로는 나누는게 맞는데 여기서만 쓰일거 같음 애매하네
     @PostMapping("/match/status")
     public ResponseEntity<ResponseApi<Void>> rejectApi(@RequestParam long matchingId, @RequestParam String status){
 
         if(matchingService.changeMatchStatus(matchingId, status)){
-            return ResponseEntity.ok(ResponseApi.success("거절기능 성공"));
+            return ResponseEntity.ok(ResponseApi.success("경기 수락 거절기능 성공"));
         }else{
             throw new CustomException(ErrorCode.PARAMETER_NOT_FOUND);
         }
