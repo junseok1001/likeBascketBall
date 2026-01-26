@@ -27,12 +27,15 @@ public class ClubController {
         return "/clubForm/clubInfo";
     }
 
+//   추후 더 만들 페이지
     @GetMapping("/club/detail")
     public String detail(Model model){
 
 
         return "/clubForm/clubDetail";
     }
+
+
 
 
 

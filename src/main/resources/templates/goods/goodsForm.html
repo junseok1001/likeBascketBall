@@ -1,133 +1,180 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basketball Hub - 상품 등록</title>
-    
+    <title>Basketball Hub - 동호회 상세</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
-    <style>
-        /* 가이드 이미지 디자인 적용 */
-        .form-section-title { margin-top: 100px; margin-bottom: 30px; }
-        .form-section-title h2 { font-weight: 700; font-size: 1.8rem; }
-        .form-label span { color: #f37321; margin-left: 2px; }
-        .form-control { padding: 12px; border: 1px solid #ced4da; border-radius: 8px; }
-        
-        /* 사진 업로드 영역 가이드 반영 */
-        .image-upload-area {
-            border: 2px dashed #dbdbdb;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            background-color: #fff;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .image-upload-area:hover { background-color: #f9f9f9; border-color: #f37321; }
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
-        /* 하단 버튼 가이드 반영 */
-        .btn-cancel { background-color: #e9ecef; color: #495057; border: none; padding: 15px; font-weight: 700; border-radius: 8px; }
-        .btn-submit-orange { background-color: #f37321; color: white; border: none; padding: 15px; font-weight: 700; border-radius: 8px; }
-        .btn-submit-orange:hover { background-color: #d65d10; color: white; }
+    <style>
+        :root { --primary-orange: #f37321; }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; }
+
+        /* 네비게이션 바 (기본 스타일 유지) */
+        .main-nav { background: white; border-bottom: 1px solid #eee; }
+        .nav-auth-link { color: #333; text-decoration: none; font-size: 0.9rem; }
+        .btn-orange { background-color: var(--primary-orange); border: none; color: white; }
+        .btn-orange:hover { background-color: #d65f10; color: white; }
+
+        /* 동호회 상세 섹션 스타일 */
+        .club-detail-container { margin-top: 100px; margin-bottom: 50px; }
+        .main-club-img-wrapper { width: 100%; border-radius: 12px; overflow: hidden; height: 400px; }
+        .main-club-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .thumb-img {
+            width: 100%; border-radius: 8px; cursor: pointer; height: 85px;
+            object-fit: cover; border: 2px solid transparent; transition: 0.2s;
+        }
+        .thumb-img:hover { opacity: 0.8; }
+        .thumb-img.active { border-color: var(--primary-orange); }
+
+        .info-card { background: white; border-radius: 15px; padding: 25px; border: none; }
+        .info-item {  align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px; }
+
+        .text-pre-wrap {
+            white-space: pre-wrap;
+        }
     </style>
 </head>
-<body class="bg-light">
+<body>
 
-    <nav class="navbar navbar-expand-lg fixed-top main-nav scrolled">
-        <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="index.html">
-                <img src="https://img.icons8.com/emoji/48/basketball-emoji.png" width="30" class="me-2" alt="logo">
-                Basketball Hub
-            </a>
-            <div class="ms-auto">
-                <a href="market.html" class="text-decoration-none text-dark small fw-bold">상품 목록</a>
+<nav class="navbar navbar-expand-lg fixed-top main-nav shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/main">
+            <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" alt="logo" width="30" class="me-2"> Basketball Hub
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto fw-medium">
+                <li class="nav-item"><a class="nav-link" href="#">홈</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">동호회모집</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">농구용품샵</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">친선경기신청</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">경기결과/랭킹</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">자유게시판</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-3">
+                <th:block th:if="${session.user == null}">
+                    <a href="/user/login" class="nav-auth-link">로그인</a>
+                    <a href="/user/join" class="btn btn-orange text-white px-4 fw-bold shadow-sm">회원가입</a>
+                </th:block>
+                <th:block th:unless="${session.user== null}">
+                    <div class="dropdown">
+                        <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-fill  nav-auth-link fs-4"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
+                            <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
+                            <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}"><li><a class="dropdown-item" href="/club/info">동호회 관리</a></li></th:block>
+                        </ul>
+                    </div>
+                </th:block>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <div class="container pb-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 form-section-title">
-                <h2>상품 등록</h2>
-                <p class="text-muted">판매할 농구용품 정보를 입력해주세요.</p>
+<main class="container club-detail-container">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="main-club-img-wrapper mb-3 shadow-sm">
+                <img id="mainImage" src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1000" class="main-club-img" alt="대표 이미지">
+            </div>
+            <div class="row g-2 gallery-thumbs">
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1546519638-68e109498ffc" width="500" class="thumb-img active"></div>
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1519861531473-9200362f46b3" width="500" class="thumb-img"></div>
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a" width="500" class="thumb-img"></div>
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1511886929837-354d827aae26" width="500" class="thumb-img"></div>
             </div>
         </div>
 
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card border-0 shadow-sm p-4 rounded-4">
-                    <form id="marketPostForm">
-                        <input type="hidden" name="sales_status" value="SALE">
-
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">상품명 <span>*</span></label>
-                            <input type="text" name="title" class="form-control" placeholder="예: 나이키 에어 조던 XXXVIII" required>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">가격 (원) <span>*</span></label>
-                            <input type="number" name="price" class="form-control" placeholder="예: 259000" required>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">상품 설명 <span>*</span></label>
-                            <textarea name="goods_info" class="form-control" rows="8" placeholder="사이즈, 구매 시기, 하자 유무 등 정보를 자세하게 적어주세요." required></textarea>
-                            <div class="text-end small text-muted mt-1">0/500</div>
-                        </div>
-
-                        <div class="mb-5">
-                            <label class="form-label fw-bold">상품 사진 <span>*</span> (최대 10장)</label>
-                            <label for="imageInput" class="image-upload-area d-block">
-                                <i class="fas fa-image fs-1 text-muted mb-2"></i>
-                                <p class="mb-0 fw-bold">클릭하여 사진을 업로드하세요</p>
-                                <p class="small text-muted">JPG, PNG 파일 (최대 5MB)</p>
-                                <input type="file" id="imageInput" name="goods_image" hidden multiple accept="image/*" required>
-                            </label>
-                            <div id="imagePreview" class="d-flex gap-2 mt-3 overflow-auto"></div>
-                        </div>
-
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <button type="button" onclick="history.back()" class="btn btn-cancel w-100">취소</button>
-                            </div>
-                            <div class="col-6">
-                                <button type="submit" class="btn btn-submit-orange w-100">등록하기</button>
-                            </div>
-                        </div>
-                    </form>
+        <div class="col-lg-5">
+            <div class="info-card shadow-sm">
+                <div class="d-flex align-items-center mb-4">
+                    <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" width="45" class="me-3">
+                    <div>
+                        <h3 class="fw-bold mb-0">물품 상세</h3>
+                        <span class="text-muted small"><i class="bi bi-geo-alt-fill"></i> 거러ㅐ 위치</span>
+                    </div>
                 </div>
+
+                <div class="info-item">
+                    <div class="fw-bold"> 구매 가격</div>
+                    <div>
+                        <p class="text-muted text-pre-wrap">
+"예제"
+사진처럼 외관 이쁘고 상태 괜찮습니다.
+실사용 거의 없어서 판매합니다.
+
+컴퓨터 2세트 두고 있는데
+집에서는 잘 안 써서 하나 정리합니다.
+
+윈도우11 설치 완료
+엑셀, 워드, 파워포인트, 한글 다 있습니다.
+초기화도 다 해둔 상태입니다.
+
+발로란트, 피파, 롤, 메이플, 로블록스
+잘 돌아갑니다 !!
+
+컴퓨터 + 모니터 + 키보드 + 마우스 + 선
+풀세트 구성입니다.
+
+가까운 곳은 직접 가져다드릴게요.
+1세트당 35만원입니다.</p>
+                        <div>--------------------------------------------------------------------------------</div>
+                        <p class="fw-bold text-pre-wrap">
+"예제"
+i5 4570
+RAM 8GB
+GTX650
+SSD 256GB
+파워 600W
+
+24인치 모니터 미개봉입니다!!
+게이밍 키보드, 게이밍 마우스, 각종 선
+
+네고는 정중히 사양합니다.
+연락 주세요~
+                        </p>
+                    </div>
+                </div>
+
+                <button id="applyBtn" class="btn btn-orange w-100 py-3 fw-bold mt-3 shadow">
+                    <i class="bi bi-person-plus-fill me-2"></i> 구매 채팅 보내기
+                </button>
             </div>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // 이미지 미리보기 로직
-            $('#imageInput').on('change', function(e) {
-                const files = e.target.files;
-                $('#imagePreview').empty();
-                for(let i=0; i<files.length; i++) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const html = `<img src="${event.target.result}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #eee;">`;
-                        $('#imagePreview').append(html);
-                    }
-                    reader.readAsDataURL(files[i]);
-                }
-            });
+</main>
 
-            // 폼 제출 로직
-            $('#marketPostForm').on('submit', function(e) {
-                e.preventDefault();
-                alert('상품이 성공적으로 등록되었습니다!');
-                location.href = 'market.html';
-            });
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // 갤러리 이미지 클릭 시 메인 이미지 변경 기능
+        $('.thumb-img').on('click', function() {
+            const newSrc = $(this).attr('src');
+            $('#mainImage').attr('src', newSrc);
+
+            // active 클래스 이동
+            $('.thumb-img').removeClass('active');
+            $(this).addClass('active');
         });
-    </script>
+
+        // 가입 신청 버튼 클릭 이벤트 예시
+        $('#applyBtn').on('click', function() {
+            alert("채팅 보내는 기능으로 바꿈");
+        });
+    });
+</script>
 </body>
 </html>

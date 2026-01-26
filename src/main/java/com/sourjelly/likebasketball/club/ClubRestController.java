@@ -54,6 +54,8 @@ public class ClubRestController {
 
     }
 
+    // 동호회 가입기능 넣어야함
+
 
 
 }
