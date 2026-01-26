@@ -20,6 +20,7 @@ public enum ErrorCode {
     , NO_MATCHING(404, "경기를 찾을수 없습니다.")
     , ALREADY_SUBMIT(202 , "이미 수락되었습니다")
     , ALREADY_REJECT(202 , "이미 거절되었습니다")
+    , NOT_FOUND_GOODS(404, "상품을 찾을수 없습니다.")
     ;
 
     private final int status;

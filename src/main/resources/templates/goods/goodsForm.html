@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basketball Hub - 동호회 상세</title>
+    <title>상품 등록 - 사진 구분형</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-
     <style>
         :root { --primary-orange: #f37321; }
         body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; }
@@ -21,41 +18,69 @@
         .btn-orange { background-color: var(--primary-orange); border: none; color: white; }
         .btn-orange:hover { background-color: #d65f10; color: white; }
 
-        /* 동호회 상세 섹션 스타일 */
-        .club-detail-container { margin-top: 100px; margin-bottom: 50px; }
-        .main-club-img-wrapper { width: 100%; border-radius: 12px; overflow: hidden; height: 400px; }
-        .main-club-img { width: 100%; height: 100%; object-fit: cover; }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f4f4f4; padding: 40px 0; }
+        .upload-card { max-width: 900px; margin: auto; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 30px; }
 
-        .thumb-img {
-            width: 100%; border-radius: 8px; cursor: pointer; height: 85px;
-            object-fit: cover; border: 2px solid transparent; transition: 0.2s;
+        /* 대표 사진 스타일 */
+        .main-upload-zone {
+            width: 100%;
+            height: 300px;
+            border: 2px dashed #0d6efd;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            background-color: #f0f7ff;
+            transition: 0.3s;
+            position: relative;
         }
-        .thumb-img:hover { opacity: 0.8; }
-        .thumb-img.active { border-color: var(--primary-orange); }
+        .main-upload-zone:hover { background-color: #e1eeff; }
+        .main-upload-zone img { width: 100%; height: 100%; object-fit: cover; }
+        .badge-main { position: absolute; top: 10px; left: 10px; background: #0d6efd; color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 12px; z-index: 5; }
 
-        .info-card { background: white; border-radius: 15px; padding: 25px; border: none; }
-        .info-item {  align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px; }
-
-        .text-pre-wrap {
-            white-space: pre-wrap;
+        /* 상세 사진 리스트 스타일 */
+        .sub-preview-wrapper { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; }
+        .sub-img-box {
+            width: 100px; height: 100px; border: 1px solid #ddd; border-radius: 8px;
+            position: relative; flex-shrink: 0; background-size: cover; background-position: center;
         }
+        .add-sub-btn {
+            width: 100px; height: 100px; border: 1px dashed #ccc; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 24px; color: #aaa;
+        }
+
+        .remove-btn {
+            position: absolute; top: -5px; right: -5px; background: #ff4d4d; color: white;
+            width: 20px; height: 20px; border-radius: 50%; font-size: 12px; line-height: 18px; text-align: center; cursor: pointer; border: none;
+        }
+
+        .section-title { font-size: 18px; font-weight: 700; margin-bottom: 15px; color: #333; }
+        .form-label { font-weight: 600; color: #555; }
+        .btn-submit { background: #333; color: white; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 30px; border: none; }
+        .btn-submit:hover { background: #000; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg fixed-top main-nav shadow-sm">
+<nav class="navbar navbar-expand-lg fixed-top main-nav">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/main">
+        <a class="navbar-brand fw-bold" href="#">
             <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" alt="logo" width="30" class="me-2"> Basketball Hub
         </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto fw-medium">
-                <li class="nav-item"><a class="nav-link" href="#">홈</a></li>
-                <li class="nav-item"><a class="nav-link active" href="#">동호회모집</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">농구용품샵</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">친선경기신청</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">경기결과/랭킹</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">자유게시판</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#home">홈</a></li>
+                <li class="nav-item"><a class="nav-link" href="#clubs">동호회모집</a></li>
+                <li class="nav-item"><a class="nav-link" href="#shop">농구용품샵</a></li>
+                <li class="nav-item"><a class="nav-link" href="#matches">친선경기신청</a></li>
+                <li class="nav-item"><a class="nav-link" href="#rankings">경기결과/랭킹</a></li>
+                <li class="nav-item"><a class="nav-link" href="#board">자유게시판</a></li>
             </ul>
             <div class="d-flex align-items-center gap-3">
                 <th:block th:if="${session.user == null}">
@@ -70,7 +95,7 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
                             <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
-                            <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}"><li><a class="dropdown-item" href="/club/info">동호회 관리</a></li></th:block>
+                            <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}"><li><a class="dropdown-item" th:href="|/club/info/${session.user.id}|">동호회 관리</a></li></th:block>
                         </ul>
                     </div>
                 </th:block>
@@ -79,79 +104,54 @@
     </div>
 </nav>
 
-<main class="container club-detail-container">
-    <div class="row g-4">
-        <div class="col-lg-7">
-            <div class="main-club-img-wrapper mb-3 shadow-sm">
-                <img id="mainImage" src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1000" class="main-club-img" alt="대표 이미지">
-            </div>
-            <div class="row g-2 gallery-thumbs">
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1546519638-68e109498ffc" width="500" class="thumb-img active"></div>
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1519861531473-9200362f46b3" width="500" class="thumb-img"></div>
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a" width="500" class="thumb-img"></div>
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1511886929837-354d827aae26" width="500" class="thumb-img"></div>
-            </div>
-        </div>
+    <div class="container mt-3">
+        <div class="upload-card">
+            <form id="productForm">
+                <div class="mb-5">
+                    <p class="section-title">대표 사진 (1장 필수)</p>
+                    <div class="main-upload-zone" id="mainZone">
+                        <span class="badge-main">대표이미지</span>
+                        <div id="mainPlaceholder" class="text-center">
+                            <p class="mb-0">클릭하여 대표 이미지를 업로드하세요</p>
+                            <small class="text-muted">가장 먼저 보여질 메인 사진입니다.</small>
+                        </div>
+                    </div>
+                    <input type="file" id="mainInput" accept="image/*" style="display:none;">
+                </div>
 
-        <div class="col-lg-5">
-            <div class="info-card shadow-sm">
-                <div class="d-flex align-items-center mb-4">
-                    <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" width="45" class="me-3">
-                    <div>
-                        <h3 class="fw-bold mb-0">물품 상세</h3>
-                        <span class="text-muted small"><i class="bi bi-geo-alt-fill"></i> 거러ㅐ 위치</span>
+                <div class="mb-5">
+                    <p class="section-title">상세 사진 (여러 장 등록 가능)</p>
+                    <div class="sub-preview-wrapper" id="subArea">
+                        <div class="add-sub-btn" id="subBtn">+</div>
+                    </div>
+                    <input type="file" id="subInput" accept="image/*" multiple style="display:none;">
+                </div>
+
+                <hr>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-8">
+                        <label class="form-label">상품명</label>
+                        <input type="text" id="title" class="form-control form-control-lg" placeholder="상품 이름을 입력하세요" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">가격 (₩)</label>
+                        <input type="number" id="price" class="form-control form-control-lg" placeholder="0">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">거래 위치</label>
+                        <input type="text" id="location" class="form-control" placeholder="지역 혹은 지하철역">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">상세 설명</label>
+                        <textarea id="goodsExplain" class="form-control" rows="6" placeholder="제품의 상태(흠집, 사용감), 구매 시기, 게임 구동 여부 등을 상세히 입력해 주세요."></textarea>
                     </div>
                 </div>
 
-                <div class="info-item">
-                    <div class="fw-bold"> 구매 가격</div>
-                    <div>
-                        <p class="text-muted text-pre-wrap">
-"예제"
-사진처럼 외관 이쁘고 상태 괜찮습니다.
-실사용 거의 없어서 판매합니다.
-
-컴퓨터 2세트 두고 있는데
-집에서는 잘 안 써서 하나 정리합니다.
-
-윈도우11 설치 완료
-엑셀, 워드, 파워포인트, 한글 다 있습니다.
-초기화도 다 해둔 상태입니다.
-
-발로란트, 피파, 롤, 메이플, 로블록스
-잘 돌아갑니다 !!
-
-컴퓨터 + 모니터 + 키보드 + 마우스 + 선
-풀세트 구성입니다.
-
-가까운 곳은 직접 가져다드릴게요.
-1세트당 35만원입니다.</p>
-                        <div>--------------------------------------------------------------------------------</div>
-                        <p class="fw-bold text-pre-wrap">
-"예제"
-i5 4570
-RAM 8GB
-GTX650
-SSD 256GB
-파워 600W
-
-24인치 모니터 미개봉입니다!!
-게이밍 키보드, 게이밍 마우스, 각종 선
-
-네고는 정중히 사양합니다.
-연락 주세요~
-                        </p>
-                    </div>
-                </div>
-
-                <button id="applyBtn" class="btn btn-orange w-100 py-3 fw-bold mt-3 shadow">
-                    <i class="bi bi-person-plus-fill me-2"></i> 구매 채팅 보내기
-                </button>
-            </div>
+                <button type="submit" class="btn-submit shadow">상품 등록 완료</button>
+            </form>
         </div>
     </div>
-
-</main>
 
 
 
@@ -160,21 +160,108 @@ SSD 256GB
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script>
     $(document).ready(function() {
-        // 갤러리 이미지 클릭 시 메인 이미지 변경 기능
-        $('.thumb-img').on('click', function() {
-            const newSrc = $(this).attr('src');
-            $('#mainImage').attr('src', newSrc);
+        let mainFile = null;
+        let subFiles = [];
 
-            // active 클래스 이동
-            $('.thumb-img').removeClass('active');
-            $(this).addClass('active');
+        // --- 대표 사진 처리 ---
+        $('#mainZone').click(function() { $('#mainInput').click(); });
+
+        $('#mainInput').change(function(e) {
+            const file = e.target.files[0];
+            if(file) {
+                mainFile = file;
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#mainZone').html(`
+                    <span class="badge-main">대표이미지</span>
+                    <img src="${e.target.result}">
+                `);
+                };
+                reader.readAsDataURL(file);
+            }
         });
 
-        // 가입 신청 버튼 클릭 이벤트 예시
-        $('#applyBtn').on('click', function() {
-            alert("채팅 보내는 기능으로 바꿈");
+        // --- 상세 사진 처리 ---
+        $('#subBtn').click(function() { $('#subInput').click(); });
+
+        $('#subInput').change(function(e) {
+            let files = Array.from(e.target.files);
+            files.forEach(file => {
+                subFiles.push(file);
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let html = `
+                    <div class="sub-img-box" style="background-image: url('${e.target.result}')">
+                        <div class="remove-btn">×</div>
+                    </div>
+                `;
+                    $('#subArea').append(html);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // 상세 사진 개별 삭제
+        $(document).on('click', '.remove-btn', function() {
+            const idx = $('.remove-btn').index(this);
+            subFiles.splice(idx, 1);
+            $(this).parent().remove();
+        });
+
+        // --- 폼 제출 ---
+        $('#productForm').on('submit', function(e) {
+            e.preventDefault();
+
+            let title = $('#title').val();
+            let price = $('#price').val();
+            let location = $('#location').val();
+            let explain = $('#goodsExplain').val();
+
+
+
+            if(!mainFile) {
+                alert("대표 사진을 1장 이상 등록해 주세요.");
+                return;
+            }
+
+            // 실제 전송할 데이터 구성
+            let formData = new FormData();
+            formData.append("mainImage", mainFile);
+            subFiles.forEach(file => {
+                formData.append(`detailImage`, file);
+            });
+            formData.append("title", title);
+            formData.append("price", price);
+            formData.append("location", location);
+            formData.append("goodsInfo", explain);
+
+            console.log(title + "\n" + price + "\n" + location + "\n" + explain + "\n" + mainFile + "\n" + subFiles)
+
+            $.ajax({
+                type: "post"
+                , url: "/goods"
+                , data: formData
+                , contentType: false
+                , processData: false
+                , success: function(response){
+                    if(response.result === "success"){
+                        window.location.href="/goods";
+                    }
+                }
+                , error: function(xhr){
+                    let error = xhr.responseJSON;
+
+                    if(error.status == 404){
+                        alert(error.message);
+                    }else if(error.status == 400){
+                        alert(error.message);
+                    }
+
+                }
+            });
         });
     });
 </script>
+
 </body>
 </html>

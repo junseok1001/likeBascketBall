@@ -6,79 +6,169 @@
     <title>Basketball Hub - 중고장터</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        :root { --primary-orange: #f37321; }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; }
+
+        /* 네비게이션 바 (원본 유지) */
+        .main-nav { background: white; border-bottom: 1px solid #eee; }
+        .nav-auth-link { color: #333; text-decoration: none; font-size: 0.9rem; }
+        .btn-orange { background-color: var(--primary-orange); border: none; color: white; }
+        .btn-orange:hover { background-color: #d65f10; color: white; }
+
+        /* 중고장터 상품 카드 스타일 */
+        .market-item-card {
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            background: #fff;
+        }
+
+        /* 카드 마우스 호버: 위로 들리는 효과 및 그림자 */
+        .market-item-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
+        }
+
+        /* 이미지 래퍼: 이미지 크기 및 비율 고정 */
+        .market-img-wrapper {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* 정사각형 비율 */
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        .market-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 비율 유지하며 꽉 채움 */
+            transition: transform 0.5s ease;
+        }
+
+        /* 호버 시 이미지 확대 효과 */
+        .market-item-card:hover .market-img-wrapper img {
+            transform: scale(1.1);
+        }
+
+        .location-text { font-size: 0.85rem; color: #888; }
+        .price-text { font-weight: 700; font-size: 1.15rem; color: #212529; }
+
+        /* 플로팅 버튼 */
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.2s;
+        }
+        .floating-btn:hover { transform: scale(1.1); }
+
+        /*구매상태 style*/
+        .bg-green-light { background-color: #E8F5E9; color: #2E7D32; }
+        .bg-red-light { background-color: #FFEBEE; color: #C62828; }
+
+    </style>
 </head>
 <body class="bg-light">
 
-    <nav class="navbar navbar-expand-lg fixed-top main-nav scrolled">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="index.html">🏀 Basketball Hub</a>
+<nav class="navbar navbar-expand-lg fixed-top main-nav">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="#">
+            <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" alt="logo" width="30" class="me-2"> Basketball Hub
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto fw-medium">
+                <li class="nav-item"><a class="nav-link active" href="#home">홈</a></li>
+                <li class="nav-item"><a class="nav-link" href="#clubs">동호회모집</a></li>
+                <li class="nav-item"><a class="nav-link" href="#shop">농구용품샵</a></li>
+                <li class="nav-item"><a class="nav-link" href="#matches">친선경기신청</a></li>
+                <li class="nav-item"><a class="nav-link" href="#rankings">경기결과/랭킹</a></li>
+                <li class="nav-item"><a class="nav-link" href="#board">자유게시판</a></li>
+            </ul>
             <div class="d-flex align-items-center gap-3">
-                <a href="market-post.html" class="btn btn-orange text-white fw-bold">물건 팔기</a>
+                <th:block th:if="${session.user == null}">
+                    <a href="/user/login" class="nav-auth-link">로그인</a>
+                    <a href="/user/join" class="btn btn-orange text-white px-4 fw-bold shadow-sm">회원가입</a>
+                </th:block>
+                <th:block th:unless="${session.user== null}">
+                    <div class="dropdown">
+                        <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-fill nav-auth-link fs-4"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
+                            <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
+                            <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}">
+                                <li><a class="dropdown-item" th:href="|/club/info/${session.user.id}|">동호회 관리</a></li>
+                            </th:block>
+                        </ul>
+                    </div>
+                </th:block>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <div class="container" style="margin-top: 120px; margin-bottom: 60px;">
-        <div class="d-flex justify-content-between align-items-end mb-4">
-            <div>
-                <h2 class="fw-bold mb-1">중고 거래 장터</h2>
-                <p class="text-muted">내 근처 농구인들의 득템 기회</p>
-            </div>
-            <div class="dropdown">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">최신순</button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#">최신순</a></li>
-                    <li><a class="dropdown-item" href="#">낮은 가격순</a></li>
-                    <li><a class="dropdown-item" href="#">가까운 지역순</a></li>
-                </ul>
-            </div>
+<div class="container" style="margin-top: 120px; margin-bottom: 60px;">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">중고 거래 장터</h2>
+            <p class="text-muted">내 근처 농구인들의 득템 기회</p>
         </div>
-
-        <div class="row g-4">
-            <div class="col-6 col-md-4 col-lg-3">
-                <a href="#" class="text-decoration-none text-dark">
-                    <div class="card market-item-card border-0 shadow-sm">
-                        <div class="market-img-wrapper">
-                            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" alt="상품이미지">
-                        </div>
-                        <div class="card-body p-3">
-                            <h6 class="fw-bold mb-1 text-truncate">나이키 에어 조던 (실착 3회)</h6>
-                            <div class="location-text mb-2">서울 강남구 • 2분 전</div>
-                            <div class="price-text">85,000원</div>
-                            <div class="mt-2 d-flex gap-2">
-                                <span class="text-muted small"><i class="far fa-heart"></i> 12</span>
-                                <span class="text-muted small"><i class="far fa-comment"></i> 3</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-3">
-                <a href="#" class="text-decoration-none text-dark">
-                    <div class="card market-item-card border-0 shadow-sm">
-                        <div class="market-img-wrapper">
-                            <img src="https://images.unsplash.com/photo-1519861531473-9200362f46b3?w=500" alt="상품이미지">
-                        </div>
-                        <div class="card-body p-3">
-                            <h6 class="fw-bold mb-1 text-truncate">윌슨 농구공 7호 미개봉</h6>
-                            <div class="location-text mb-2">경기 화성시 • 15분 전</div>
-                            <div class="price-text">35,000원</div>
-                            <div class="mt-2 d-flex gap-2">
-                                <span class="text-muted small"><i class="far fa-heart"></i> 5</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            </div>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">최신순</button>
+            <ul class="dropdown-menu">
+                <li><a id="recentBtn" class="dropdown-item" href="#">최신순</a></li>
+                <li><a id="rowPriceBtn" class="dropdown-item" href="#">낮은 가격순</a></li>
+            </ul>
+        </div>
     </div>
 
-    <a href="market-post.html" class="btn btn-orange text-white floating-btn d-md-none">
-        <i class="fas fa-plus"></i>
-    </a>
+    <div class="row g-4">
+        <div th:each="goods: ${goodsList}" class="col-6 col-md-4 col-lg-3">
+            <a th:href="|/goods/detail/${goods.goodsId}|" href="#" class="text-decoration-none text-dark">
+                <div class="card market-item-card border-0 shadow-sm">
+                    <div class="market-img-wrapper">
+                        <img th:src="${goods.mainImage}" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff" alt="상품이미지">
+                    </div>
+                    <div class="card-body p-3">
+                        <h6 th:text="${goods.title}" class="fw-bold mb-1 text-truncate">나이키 에어 조던 (실착 3회)</h6>
+                        <div th:text="${goods.location} + ' • ' + ${goods.formattedCreatedAt}" class="location-text mb-2">서울 강남구 • 2분전 </div>
+                        <div th:text="|${#numbers.formatInteger(goods.price, 3, 'COMMA')}원|" class="price-text">85,000</div>
+                        <div class="mt-2 d-flex gap-2">
+                            <span th:if="${goods.salesStatus.name() == 'SALE'}"  class="badge rounded-pill bg-green-light px-3 py-2">구매가능</span>
+                            <span th:if="${goods.salesStatus.name() == 'SOLD_OUT'}"  class="badge rounded-pill bg-red-light px-3 py-2">판매완료</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+</div>
+
+<a href="/goods/form" class="btn btn-orange text-white floating-btn">
+    <i class="fas fa-plus"></i>
+</a>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+</script>
 </body>
 </html>

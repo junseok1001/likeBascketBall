@@ -16,6 +16,8 @@ public class FileManger {
 
     public final static String FILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload\\clubDetailPhoto";
     public final static String PROFILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload\\clubProfile";
+    public final static String GOODS_MAINPHOTO_PATH="D:\\webInventor\\personalproject\\project\\upload\\goodsMainPhoto";
+    public final static String GOODS_DETAILPHOTO_PATH="D:\\webInventor\\personalproject\\project\\upload\\goodsDetailPhoto";
 
     public static String saveFile(long userId, MultipartFile file){
 
@@ -152,7 +154,83 @@ public class FileManger {
         }
 
         return true;
-
     }
+
+
+    public static String saveGoodsMain(long userId, MultipartFile file){
+
+        if(file == null){
+            return null;
+        }
+
+        String directoryName = "/" + userId + "_" + System.currentTimeMillis();
+
+        String directoryPath = GOODS_MAINPHOTO_PATH + directoryName;
+
+        File directory = new File(directoryPath);
+
+        if (!directory.mkdir()) {
+            // 파일 생성 실패
+            return null;
+        }
+
+        String filePath = directoryPath + "/" + file.getOriginalFilename();
+        File filePart = new File(filePath);
+
+        try{
+            // 경로를 관리하는 객체 + file write를 같이 내부적으로 해준다.
+            file.transferTo(filePart);
+
+//            // 파일경로를 관리하는 객체
+//            Path path = Paths.get(filePath);
+//            //
+//            Files.write(path, bytes);
+        }catch(IOException e){
+            return null;
+        }
+
+
+        return "/images" + directoryName + "/" + file.getOriginalFilename();
+    }
+
+    public static String saveGoodsDetail(long userId, MultipartFile file){
+
+        if(file == null){
+            return null;
+        }
+
+        String directoryName = "/" + userId + "_" + System.currentTimeMillis();
+
+        String directoryPath = GOODS_DETAILPHOTO_PATH + directoryName;
+
+        File directory = new File(directoryPath);
+
+        if (!directory.mkdir()) {
+            // 파일 생성 실패
+            return null;
+        }
+
+        String filePath = directoryPath + "/" + file.getOriginalFilename();
+        File filePart = new File(filePath);
+
+        try{
+            // 경로를 관리하는 객체 + file write를 같이 내부적으로 해준다.
+            file.transferTo(filePart);
+
+//            // 파일경로를 관리하는 객체
+//            Path path = Paths.get(filePath);
+//            //
+//            Files.write(path, bytes);
+        }catch(IOException e){
+            return null;
+        }
+
+
+        return "/images" + directoryName + "/" + file.getOriginalFilename();
+    }
+
+
+
+
 
 }
