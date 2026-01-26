@@ -32,8 +32,7 @@ body { font-family: 'Noto Sans KR', sans-serif; color: #333; }
 .club-card:hover { transform: translateY(-10px); }
 .club-info p { margin-bottom: 5px; font-size: 0.9rem; }
 .club-info i { width: 20px; color: #999; }
-.badge-level { background: #fff4ed; color: var(--primary-orange); border: 1px solid var(--primary-orange); font-size: 0.75rem; }
-.badge-level.high { background: #fff0f0; color: #e63946; border-color: #e63946; }
+
 
 /* 친선경기/게시판 리스트 */
 .vs-badge { background: #f8f9fa; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid #ddd; }

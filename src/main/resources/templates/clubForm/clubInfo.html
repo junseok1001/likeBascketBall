@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basketball Hub - 동호회 관리</title>
+
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-orange: #f08c55;
+            --bg-light: #f8f9fa;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            padding-top: 80px;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        }
+
+        /* 네비게이션 바 (기본 스타일 유지) */
+        .main-nav { background: white; border-bottom: 1px solid #eee; }
+        .nav-auth-link { color: #333; text-decoration: none; font-size: 0.9rem; }
+        .btn-orange { background-color: var(--primary-orange); border: none; color: white; }
+        .btn-orange:hover { background-color: #d65f10; color: white; }
+
+
+
+
+        .content-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .form-label { font-weight: 600; font-size: 0.95rem; margin-bottom: 8px; }
+        .form-label .required { color: #ff4d4f; margin-left: 3px; }
+
+        /* --- 프로필 이미지 스타일 추가 --- */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .profile-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        #profilePreview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #eee;
+            background-color: #f8f9fa;
+        }
+
+        /* 삭제 X 버튼 (수정 모드에서만 표시) */
+        .del-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: #ff4d4f;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: none; /* 기본 숨김 */
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border: 2px solid white;
+            font-size: 14px;
+        }
+
+        /* 수정 모드 활성화 시 프로필 업로드 버튼 보이기 */
+        .profile-edit-controls {
+            display: none;
+        }
+
+        .form-control:disabled, .form-select:disabled {
+            background-color: #f4f6f8 !important;
+            border: 1px solid #eee !important;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top main-nav shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/main">
+            <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" alt="logo" width="30" class="me-2"> Basketball Hub
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mx-auto fw-medium">
+                <li class="nav-item"><a class="nav-link" href="#">홈</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">동호회모집</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">농구용품샵</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">친선경기신청</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">경기결과/랭킹</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">자유게시판</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-3">
+                <th:block th:if="${session.user == null}">
+                    <a href="/user/login" class="nav-auth-link">로그인</a>
+                    <a href="/user/join" class="btn btn-orange text-white px-4 fw-bold shadow-sm">회원가입</a>
+                </th:block>
+                <th:block th:unless="${session.user== null}">
+                    <div class="dropdown">
+                        <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-fill  nav-auth-link fs-4"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
+                            <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
+                            <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}"><li><a class="dropdown-item" href="/club/info">동호회 관리</a></li></th:block>
+                        </ul>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="content-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold mb-0">동호회 정보 수정</h5>
+                    <button type="button" id="editBtn" class="btn btn-orange px-4">
+                        <i class="bi bi-pencil-fill me-2"></i> 수정하기
+                    </button>
+                </div>
+
+                <form id="clubForm"  enctype="multipart/form-data">
+                    <div id="UpdateClub" th:data-clubid="${club.id}"  class="mb-4">
+                        <label class="form-label">동호회 프로필 사진</label>
+                        <div class="profile-section">
+                            <div class="profile-wrapper">
+                                <img th:src="${club.profileImage}" id="profilePreview" alt="Profile">
+                                <div id="delProfileBtn" class="del-badge"><i class="bi bi-x"></i></div>
+                            </div>
+
+                            <div class="profile-edit-controls" id="uploadControls">
+                                <button type="button" class="btn btn-orange btn-sm fw-bold" onclick="$('#profileInput').click();">
+                                    <i class="bi bi-upload me-1"></i> 사진 변경
+                                </button>
+                                <p class="small text-muted mt-2 mb-0">JPG, PNG 파일 (최대 5MB)</p>
+                                <input type="file" id="profileInput" name="profileImage" class="d-none" accept="image/*">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">동호회 이름 <span class="required">*</span></label>
+                        <input th:value="${club.clubName}" type="text" name="clubName" class="form-control" value="서울 슬램덩크" disabled>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">활동 지역 <span class="required">*</span></label>
+                        <input th:value="${club.activityArea}" type="text" name="location" class="form-control" value="서울 강남구" disabled>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">정기 모임 요일 <span class="required">*</span></label>
+                            <select name="meetingDay" class="form-select" disabled>
+                                <option th:selected="${club.meetingDay == '월요일'}" >월요일</option>
+                                <option th:selected="${club.meetingDay == '화요일'}" >화요일</option>
+                                <option th:selected="${club.meetingDay == '수요일'}">수요일</option>
+                                <option th:selected="${club.meetingDay == '목요일'}">목요일</option>
+                                <option th:selected="${club.meetingDay == '금요일'}">금요일</option>
+                                <option th:selected="${club.meetingDay == '토요일'}">토요일</option>
+                                <option th:selected="${club.meetingDay == '일요일'}">일요일</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">정기 모임 시간 <span class="required">*</span></label>
+                            <input th:value="${club.meetingTime}" type="text" name="meetingTime" class="form-control" value="19:00 - 21:00" disabled>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">동호회 소개 <span class="required">*</span></label>
+                        <textarea th:text="${club.introduce}" name="introduce" class="form-control" rows="4" disabled>매주 토요일 저녁에 모여서 농구를 즐기는 동호회입니다.</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">회비</label>
+                        <input th:value="${club.price}" type="text" name="fee" class="form-control" value="월 30,000원" disabled>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label">연락처 <span class="required">*</span></label>
+                        <input th:Value="${club.phoneNumber}" type="text" name="contact" class="form-control" value="010-1234-5678" disabled>
+                    </div>
+                    <div class="p-4 mb-4" style="background-color: #fff9f4; border: 1px solid #ffe8d6; border-radius: 10px;">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-lock-fill me-1"></i> 동호회 가입 비밀번호</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="small fw-bold mb-1">비밀번호 <span>*</span></label>
+                                <input type="password" id="passwordInput" class="form-control" placeholder="4자 이상 입력" disabled>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold mb-1">비밀번호 확인 <span>*</span></label>
+                                <input type="password" id="passwordConfirmInput" class="form-control" placeholder="비밀번호 재입력" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script>
+    $(document).ready(function() {
+        const defaultProfileImg = "https://cdn-icons-png.flaticon.com/512/166/166258.png"; // 삭제 시 보여줄 기본 이미지
+        let profileImage = null;
+        // [수정하기] 버튼 클릭 로직
+        $('#editBtn').on('click', function() {
+            let $form = $('#clubForm');
+            let $inputs = $form.find('input, select, textarea');
+            let isEditing = $(this).hasClass('active-edit');
+
+            if (!isEditing) {
+                // 수정 모드 활성화
+                $inputs.prop('disabled', false);
+                $(this).addClass('active-edit').removeClass('btn-orange').addClass('btn-success')
+                    .html('<i class="bi bi-check-lg me-2"></i> 저장하기');
+
+                $('#delProfileBtn').css('display', 'flex'); // X 버튼 표시
+                $('#uploadControls').show(); // 업로드 버튼 표시
+            } else {
+                // 저장 처리
+                let formData = new FormData();
+                let clubId = $("#UpdateClub").data("clubId");
+                let clubName = $("input[name='clubName']").val();
+                let location = $("input[name='location']").val();
+                let meetingDay = $("select[name='meetingDay']").val();
+                let meetingTime = $("input[name='meetingTime']").val();
+                let content = $("textarea[name='introduce']").text();
+                let fee = $("input[name='fee']").val();
+                let contact = $("input[name='contact']").val();
+                let password = $("#passwordInput").val();
+                let pwConfirm = $("#passwordConfirmInput").val();
+                console.log(clubId);
+
+                formData.append("id", clubId);
+                formData.append("clubName", clubName);
+                formData.append("activityArea", location);
+                formData.append("meetingDay", meetingDay);
+                formData.append("meetingTime", meetingTime);
+                formData.append("introduce", content);
+                formData.append("price", fee);
+                formData.append("phoneNumber", contact);
+                formData.append("password", password);
+                if(profileImage != null){
+                    formData.append("profileImage", profileImage);
+                }
+
+
+                console.log("FormData 구성 완료 - 콘솔에서 확인 가능");
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+
+
+                // 비밀번호 체크
+                if(password !== pwConfirm) {
+                    alert("비밀번호가 일치하지 않습니다.");
+                    return;
+                }
+
+                // AJAX 예시 (실제 서버 연동 시 주석 해제)
+
+                $.ajax({
+                    url: '/club/update',
+                    type: 'post',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if(response.result === "success"){
+                            alert("수정이 완료되었습니다");
+                            window.location.reload();
+                        }else{
+                            alert("수정이 되었습니다");
+                        }
+
+                    }
+                    , error: function(){
+                        alert("오류");
+                    }
+                });
+
+                // 화면 잠금 상태로 복구
+                $inputs.prop('disabled', true);
+                $(this).removeClass('active-edit').removeClass('btn-success').addClass('btn-orange')
+                    .html('<i class="bi bi-pencil-fill me-2"></i> 수정하기');
+
+                $('#delProfileBtn').hide();
+                $('#uploadControls').hide();
+            }
+        });
+
+        // 사진 파일 선택 시 미리보기 적용
+        $('#profileInput').on('change', function(e) {
+            let file = e.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function(event) {
+                    $('#profilePreview').attr('src', event.target.result);
+                    $('#deleteProfileFlag').val("false"); // 새 파일을 올리면 삭제 플래그 해제
+                };
+                reader.readAsDataURL(file);
+                profileImage = file;
+            }
+        });
+
+        // 사진 삭제(X) 버튼 클릭 시
+        $('#delProfileBtn').on('click', function() {
+            if(confirm("프로필 사진을 삭제하시겠습니까?")) {
+                $('#profilePreview').attr('src', defaultProfileImg); // 미리보기를 기본 이미지로 변경
+                $('#profileInput').val(''); // input file 비우기
+                $('#deleteProfileFlag').val("true"); //  서버에서 인지할 수 있도록 플래그를 true로 변경
+                alert("삭제 표시되었습니다. 저장하기를 누르면 반영됩니다.");
+            }
+        });
+    });
+</script>
+</body>
+</html>

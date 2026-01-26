@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>친선경기 신청 - Basketball Hub</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <style>
+        :root {
+            --main-orange: #E67E22;
+            --bg-body: #F9FAFB;
+            --dark-navy: #0A192F;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            padding-top: 80px;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 컨텐츠 영역 확장 */
+        .content-wrapper { flex: 1; }
+
+        /* 네비게이션 바 */
+        .main-nav { background: white; border-bottom: 1px solid #eee; }
+        .nav-auth-link { color: #333; text-decoration: none; font-size: 0.9rem; }
+
+        /* 버튼 */
+        .btn-orange { background-color: var(--main-orange); border: none; color: white; }
+        .btn-orange:hover { background-color: #D35400; color: white; }
+
+        /* 입력 폼 커스텀 스타일 */
+        .form-label { font-size: 0.95rem; margin-bottom: 0.5rem; }
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #E5E7EB;
+            transition: all 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--main-orange);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+        }
+
+        /* 안내 박스 */
+        .bg-orange-light { background-color: #FFF3E0; color: #E67E22; border-radius: 15px; }
+
+        /* 카드 및 레이아웃 */
+        .apply-card { border-radius: 25px; background: white; }
+
+        /* 푸터 */
+        .footer { background: var(--dark-navy); color: white; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg fixed-top main-nav">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/main">
+                <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" alt="logo" width="30" class="me-2"> Basketball Hub
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto fw-medium">
+                    <li class="nav-item"><a class="nav-link active" href="#home">홈</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#clubs">동호회모집</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#shop">농구용품샵</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#matches">친선경기신청</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#rankings">경기결과/랭킹</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#board">자유게시판</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <th:block th:if="${session.user == null}">
+                        <a href="/user/login" class="nav-auth-link">로그인</a>
+                        <a href="/user/join" class="btn btn-orange text-white px-4 fw-bold shadow-sm">회원가입</a>
+                    </th:block>
+                    <th:block th:unless="${session.user== null}">
+                        <div class="dropdown">
+                            <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-fill  nav-auth-link fs-4"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
+                                <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
+                                <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}"><li><a class="dropdown-item" th:href="|/club/info/${session.user.id}|">동호회 관리</a></li></th:block>
+                            </ul>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+<div class="content-wrapper">
+    <section class="container mt-4 py-5">
+        <div class="mb-4">
+            <h2 class="fw-bold">친선경기 신청하기</h2>
+            <p class="text-secondary">다른 동호회와 실력을 겨뤄보세요</p>
+        </div>
+
+        <div class="card apply-card border-0 shadow-sm p-4 p-md-5">
+            <form id="matchApplyForm">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">신청 팀 (홈) <span class="text-danger">*</span></label>
+                        <input id="challengeClub" th:data-id="${myClub.clubId}" th:value="${myClub.clubName}" value="현재 로그인된 사용자의 동호회" type="text" class="form-control border-2" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">상대 팀 (어웨이) <span class="text-danger">*</span></label>
+                        <select name="awayClub" id="awayClub" class="form-select border-2" required>
+                            <option selected disabled>상대 동호회 선택</option>
+                            <option th:each="club : ${clubList}"
+                                    th:value="${club.clubId}"
+                                    th:text="${club.clubName}"
+                                    th:if="${myClub.clubId} != ${club.clubId}">
+                                인천 썬더스
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">경기 날짜 <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-2 border-end-0"><i class="bi bi-calendar-check"></i></span>
+                            <input id="gameDate" type="date" class="form-control border-2 border-start-0" >
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">경기 시간 <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-2 border-end-0"><i class="bi bi-clock"></i></span>
+                            <input id="gameTime" type="time" class="form-control border-2 border-start-0" >
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold">경기장 이름 <span class="text-danger">*</span></label>
+                        <input name="locationName" type="text" class="form-control border-2" placeholder="예: 강남 스포츠센터" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">경기장 주소 <span class="text-danger">*</span></label>
+                        <input name="location" type="text" class="form-control border-2" placeholder="예: 서울시 강남구 테헤란로 123" readonly required>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between">
+                            <label class="form-label fw-bold">경기 설명</label>
+                        </div>
+                        <textarea name="content" class="form-control border-2" rows="4" placeholder="경기에 대한 추가 정보나 특이사항을 작성해주세요"></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label fw-bold mb-0">연락처 <span class="text-danger">*</span></label>
+                            <span class="small text-muted" id="charCount">0/500</span>
+                        </div>
+                        <input id="phoneNumberInput" type="text" class="form-control border-2" placeholder="전화번호 또는 카카오톡 ID" required>
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <div class="bg-orange-light p-4">
+                            <div class="d-flex">
+                                <i class="bi bi-info-circle-fill me-3 fs-5"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-2">신청 안내</h6>
+                                    <ul class="small mb-0 opacity-90" style="list-style-type: '• '; padding-left: 10px;">
+                                        <li>상대 팀이 신청을 수락하면 경기가 확정됩니다.</li>
+                                        <li>경기 3일 전까지 취소 가능합니다.</li>
+                                        <li>경기 결과는 양 팀 모두 입력해야 랭킹에 반영됩니다.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-5">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-light w-100 py-3 fw-bold border shadow-sm text-secondary">취소</button>
+                            </div>
+                            <div class="col-6">
+                                <button type="submit" class="btn btn-orange w-100 py-3 fw-bold shadow-sm">신청하기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+
+<footer class="footer py-5 text-white">
+    <div class="container text-center">
+        <div class="opacity-50 small">
+            <p>© 2025 Basketball Hub. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+
+    $(document).ready(function() {
+        // 폼 제출 시 이벤트 처리
+        $('#matchApplyForm').on('submit', function(e) {
+            e.preventDefault();
+            let challengeClubId = $("#challengeClub").data("id");
+            let awayClubId = $("select[name='awayClub']").val();
+            let gameDate = $("#gameDate").val();
+            let gameTime = $("#gameTime").val();
+            let locationName = $("input[name='locationName']").val();
+            let location = $("input[name='location']").val();
+            let content = $("textarea[name='content']").val();
+            let phoneNumber =$("#phoneNumberInput").val();
+            console.log(awayClubId);
+
+            let formData = new FormData;
+            formData.append("challengeClubId", challengeClubId);
+            formData.append("awayClubId", awayClubId );
+            formData.append("gameDate", gameDate);
+            formData.append("gameTime", gameTime);
+            formData.append("locationName", locationName);
+            formData.append("location", location);
+            formData.append("content", content);
+            formData.append("phoneNumber", phoneNumber);
+
+            console.log("FormData 구성 완료 - 콘솔에서 확인 가능");
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+            // 여기에 실제 서버로 데이터를 보내는 Ajax 코드를 작성하면 됩니다.
+            $.ajax({
+                type: "post"
+                , url: "/match"
+                , data: formData
+                , processData: false
+                , contentType: false
+                , success: function(response){
+                    // console.log(response)
+                    if(response.result == "success"){
+                        alert("신청 완료되었습니다. 메인페이지로 넘어갑니다.");
+                        window.location.href="/main";
+                    }
+                }
+                , error: function(xhr){
+                    // 서버에서 에러 메세지를 구성해서 하기
+                    // 메세지 조합하는거 이거는 사실상 안좋음
+                    // console.log(xhr);
+                    // let response = xhr.responseJSON;
+                    // console.log(response);
+                    // let errors = response.fieldErrors;
+                    // console.log(errors)
+                    // let message = "";
+                    // for(let error of errors){
+                    //     message += error.reason + "\n";
+                    // }
+                    // alert(message);
+                    // console.log(xhr);
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        alert(xhr.responseJSON.message);
+                        // 출력 결과 예시: "경기 시간이 비어있습니다., 공백일 수 없습니다"
+                    } else {
+                        alert("알 수 없는 오류가 발생했습니다.");
+                    }
+                }
+            });
+        });
+
+        // 주소 띄워주는 api 추가
+        $("input[name='location']").on('click', function(){
+            new daum.Postcode({
+                oncomplete : function(data){
+                    let address = (data.userSelectedType === 'R') ? data.roadAddress : data.jibunAddress;
+                    $("input[name='location']").val(address);
+                }
+            }).open();
+
+
+
+
+            $('#phoneNumberInput').on('keyup', function() {
+                $(this).val($(this).val().replace(/[^0-9]/g, "").replace(/(^02|^0505|^1[0-9]{3}|^0[0-9]{2})([0-9]+)?([0-9]{4})$/,"$1-$2-$3").replace("--", "-"));
+            });
+        });
+
+    });
+</script>
+
+</body>
+</html>

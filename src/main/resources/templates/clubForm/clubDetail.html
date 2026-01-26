@@ -34,11 +34,16 @@
         .thumb-img.active { border-color: var(--primary-orange); }
 
         .info-card { background: white; border-radius: 15px; padding: 25px; border: none; }
-        .info-item {  align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px; }
+        .info-item { display: flex; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px; }
+        .info-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-right: 15px; }
 
-        .text-pre-wrap {
-            white-space: pre-wrap;
-        }
+        /* 아이콘별 배경색 */
+        .bg-user { background-color: #fff0e6; color: #f37321; }
+        .bg-cal { background-color: #e7f0ff; color: #0d6efd; }
+        .bg-money { background-color: #e7f5ea; color: #198754; }
+        .bg-phone { background-color: #f3e8ff; color: #8b5cf6; }
+
+        .intro-section { background: white; border-radius: 15px; padding: 30px; margin-top: 25px; }
     </style>
 </head>
 <body>
@@ -86,10 +91,10 @@
                 <img id="mainImage" src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1000" class="main-club-img" alt="대표 이미지">
             </div>
             <div class="row g-2 gallery-thumbs">
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1546519638-68e109498ffc" width="500" class="thumb-img active"></div>
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1519861531473-9200362f46b3" width="500" class="thumb-img"></div>
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a" width="500" class="thumb-img"></div>
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1511886929837-354d827aae26" width="500" class="thumb-img"></div>
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=500" class="thumb-img active"></div>
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1519861531473-9200362f46b3?w=500" class="thumb-img"></div>
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a?w=500" class="thumb-img"></div>
+                <div class="col-3"><img src="https://images.unsplash.com/photo-1511886929837-354d827aae26?w=500" class="thumb-img"></div>
             </div>
         </div>
 
@@ -98,59 +103,60 @@
                 <div class="d-flex align-items-center mb-4">
                     <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" width="45" class="me-3">
                     <div>
-                        <h3 class="fw-bold mb-0">물품 상세</h3>
-                        <span class="text-muted small"><i class="bi bi-geo-alt-fill"></i> 거러ㅐ 위치</span>
+                        <h3 class="fw-bold mb-0">서울 슬램덩크</h3>
+                        <span class="text-muted small"><i class="bi bi-geo-alt-fill"></i> 서울 강남구</span>
                     </div>
                 </div>
 
                 <div class="info-item">
-                    <div class="fw-bold"> 구매 가격</div>
+                    <div class="info-icon bg-user"><i class="bi bi-people-fill"></i></div>
                     <div>
-                        <p class="text-muted text-pre-wrap">
-"예제"
-사진처럼 외관 이쁘고 상태 괜찮습니다.
-실사용 거의 없어서 판매합니다.
+                        <div class="text-muted small">현재 회원</div>
+                        <div class="fw-bold">24명</div>
+                    </div>
+                </div>
 
-컴퓨터 2세트 두고 있는데
-집에서는 잘 안 써서 하나 정리합니다.
+                <div class="info-item">
+                    <div class="info-icon bg-cal"><i class="bi bi-calendar-check-fill"></i></div>
+                    <div>
+                        <div class="text-muted small">정기 모임</div>
+                        <div class="fw-bold">토요일 19:00 - 21:00</div>
+                    </div>
+                </div>
 
-윈도우11 설치 완료
-엑셀, 워드, 파워포인트, 한글 다 있습니다.
-초기화도 다 해둔 상태입니다.
+                <div class="info-item">
+                    <div class="info-icon bg-money"><i class="bi bi-wallet2"></i></div>
+                    <div>
+                        <div class="text-muted small">회비</div>
+                        <div class="fw-bold">월 30,000원 (코트 대관료 포함)</div>
+                    </div>
+                </div>
 
-발로란트, 피파, 롤, 메이플, 로블록스
-잘 돌아갑니다 !!
-
-컴퓨터 + 모니터 + 키보드 + 마우스 + 선
-풀세트 구성입니다.
-
-가까운 곳은 직접 가져다드릴게요.
-1세트당 35만원입니다.</p>
-                        <div>--------------------------------------------------------------------------------</div>
-                        <p class="fw-bold text-pre-wrap">
-"예제"
-i5 4570
-RAM 8GB
-GTX650
-SSD 256GB
-파워 600W
-
-24인치 모니터 미개봉입니다!!
-게이밍 키보드, 게이밍 마우스, 각종 선
-
-네고는 정중히 사양합니다.
-연락 주세요~
-                        </p>
+                <div class="info-item">
+                    <div class="info-icon bg-phone"><i class="bi bi-telephone-fill"></i></div>
+                    <div>
+                        <div class="text-muted small">연락처</div>
+                        <div class="fw-bold">010-1234-5678</div>
                     </div>
                 </div>
 
                 <button id="applyBtn" class="btn btn-orange w-100 py-3 fw-bold mt-3 shadow">
-                    <i class="bi bi-person-plus-fill me-2"></i> 구매 채팅 보내기
+                    <i class="bi bi-person-plus-fill me-2"></i> 가입 신청하기
                 </button>
             </div>
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-12">
+            <div class="intro-section shadow-sm border">
+                <h5 class="fw-bold mb-4">동호회 소개</h5>
+                <p class="text-muted lh-lg mb-0">
+                    매주 토요일 저녁에 모여서 농구를 즐기는 동호회입니다. 실력보다는 즐거운 분위기를 중요하게 생각하며, 친목을 다지는 것을 목표로 하고 있습니다. 초보자부터 경력자까지 모두 환영합니다!
+                </p>
+            </div>
+        </div>
+    </div>
 </main>
 
 
@@ -172,7 +178,7 @@ SSD 256GB
 
         // 가입 신청 버튼 클릭 이벤트 예시
         $('#applyBtn').on('click', function() {
-            alert("채팅 보내는 기능으로 바꿈");
+            alert('가입 신청이 완료되었습니다!');
         });
     });
 </script>
