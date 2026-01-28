@@ -52,6 +52,8 @@ dependencies {
     //querydsl 이 말이 맞는지는 모르겠는데 쿼리 내용 보여주는거
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
 
+    //websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('test') {

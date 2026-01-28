@@ -7,6 +7,7 @@ import com.sourjelly.likebasketball.goods.doamin.Goods;
 import com.sourjelly.likebasketball.goods.doamin.GoodsImage;
 import com.sourjelly.likebasketball.goods.doamin.SalesStatus;
 import com.sourjelly.likebasketball.goods.dto.CreateGoodsDto;
+import com.sourjelly.likebasketball.goods.dto.DetailGoods;
 import com.sourjelly.likebasketball.goods.dto.ShowGoods;
 import com.sourjelly.likebasketball.goods.repository.GoodsDetailRepository;
 import com.sourjelly.likebasketball.goods.repository.GoodsRepository;
@@ -84,9 +85,32 @@ public class GoodsService {
         }
 
         return showGoodsList;
-
     }
-    //
+    // goods id를 받아서 해당 정보 상세 정보 가져오기
+    public DetailGoods findGoodsByGoodsId(long goodsId){
+
+        Goods goods = goodsRepository.findById(goodsId)
+                                        .orElseThrow(() -> new CustomException(ErrorCode.GOODS_NOT_FOUND));
+
+        List<GoodsImage> goodsImageList = goodsDetailRepository.findByGoodsId(goodsId);
+
+        DetailGoods detailGoods = DetailGoods.builder()
+                                        .goodsId(goods.getId())
+                                        .userId(goods.getUserId())
+                                        .title(goods.getTitle())
+                                        .price(goods.getPrice())
+                                        .location(goods.getLocation())
+                                        .goodsInfo(goods.getGoodInfo())
+                                        .mainImage(goods.getGoodImage())
+                                        .salesStatus(goods.getSalesStatus())
+                                        .detailImage(goodsImageList)
+                                        .build();
+
+        if(detailGoods == null){
+            new CustomException(ErrorCode.NOT_DATA_IN_FIELD);
+        }
+        return detailGoods;
+    }
 
 
 }

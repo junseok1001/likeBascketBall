@@ -1,81 +1,151 @@
+
+/* [1. 전역 변수 및 초기화] */
 :root {
-    --primary-orange: #f37321;
-    --dark-navy: #1a1d23;
+    --primary-orange: #f37321;   /* 브랜드 메인 컬러 (농구공 색상) */
+    --hover-orange: #e66000;     /* 버튼/링크 호버 시 어두운 오렌지 */
+    --dark-navy: #1a1d23;        /* 푸터 및 어두운 배경용 네이비 */
+    --bg-light: #f8f9fa;         /* 섹션 구분용 밝은 회색 배경 */
+    --transition-speed: 0.3s;    /* 공통 애니메이션 속도 */
 }
 
-body { font-family: 'Noto Sans KR', sans-serif; color: #333; }
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #333;
+    line-height: 1.6;
+}
 
-/* 네비게이션 */
-.main-nav { transition: 0.4s ease; padding: 20px 0; }
-.main-nav.scrolled { background: white !important; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 10px 0; border-bottom: 1px solid #eee; }
-.main-nav.scrolled .navbar-brand, .main-nav.scrolled .nav-link, .main-nav.scrolled .nav-auth-link { color: #222 !important; }
+/* [2. 공통 유틸리티 스타일] */
+.section-title { font-size: 2.5rem; margin-bottom: 15px; }
+.text-orange { color: var(--primary-orange) !important; }
+
+/* 공통 버튼 스타일 (상단 로그인, 하단 시작하기 등) */
+.btn-orange {
+    background-color: var(--primary-orange);
+    border: none;
+    color: white;
+    transition: background-color var(--transition-speed) ease;
+}
+.btn-orange:hover {
+    background-color: var(--hover-orange);
+    color: white;
+}
+
+/* [3. 네비게이션 바 (Navbar)] */
+.main-nav {
+    transition: all 0.4s ease;
+    padding: 20px 0;
+}
+/* 스크롤 시 변하는 스타일 (JS와 연동) */
+.main-nav.scrolled {
+    background: white !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+.main-nav.scrolled .navbar-brand,
+.main-nav.scrolled .nav-link,
+.main-nav.scrolled .nav-auth-link { color: #222 !important; }
+
 .navbar-brand { font-family: 'Oswald', sans-serif; font-size: 1.4rem; color: white !important; }
 .nav-link { color: rgba(255,255,255,0.9) !important; margin: 0 10px; }
 .nav-link.active, .nav-link:hover { color: var(--primary-orange) !important; }
 .nav-auth-link { color: white !important; text-decoration: none; margin-right: 15px; font-size: 0.95rem; }
 
-/* 히어로 */
-.hero-section { height: 100vh; background: url('banner.jpg') center/cover; position: relative; display: flex; align-items: center; }
-.hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+/* [4. 히어로 섹션 (Hero)] */
+.hero-section {
+    height: 100vh;
+    background: url('banner.jpg') center/cover;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.hero-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+}
 .hero-container { position: relative; z-index: 2; }
 
-/* 공통 섹션 */
-.section-title { font-size: 2.5rem; margin-bottom: 15px; }
+/* [5. 카드 공통 스타일 (동호회 & 상품)] */
+/* 중복되었던 카드 기본 속성을 하나로 합쳤습니다. */
+.club-card, .product-card {
+    transition: all var(--transition-speed) ease-in-out;
+    border-radius: 15px;
+    overflow: hidden;
+    text-decoration: none !important;
+    color: inherit;
+    border: none;
+}
 
-/* 버튼 */
-.btn-orange { background: var(--primary-orange); border: none; }
-.btn-orange:hover { background: #d65d10; }
-.btn-orange-outline { border: 1px solid var(--primary-orange); color: var(--primary-orange); }
+/* 마우스 호버 시 공통 효과: 위로 들림 + 그림자 */
+.club-card:hover, .product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+}
 
-/* 클럽/상품 카드 */
-.club-card, .product-card { transition: 0.3s; border-radius: 15px; overflow: hidden; }
-.club-card:hover { transform: translateY(-10px); }
-.club-info p { margin-bottom: 5px; font-size: 0.9rem; }
-.club-info i { width: 20px; color: #999; }
+/* 상품 섹션 전용 이미지 확대 효과 */
+.product-card .card-img-top {
+    transition: transform 0.5s ease;
+    object-fit: cover;
+    height: 250px;
+}
+.product-card:hover .card-img-top {
+    transform: scale(1.1);
+}
 
+/* [6. 리스트 및 테이블 (경기신청 & 랭킹)] */
+.vs-badge {
+    background: #f8f9fa; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.8rem; font-weight: bold; border: 1px solid #ddd;
+}
 
-/* 친선경기/게시판 리스트 */
-.vs-badge { background: #f8f9fa; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid #ddd; }
-.match-item, .board-item { transition: 0.2s; cursor: pointer; }
+/* 리스트 항목 호버 효과 */
+.match-item, .board-item { transition: background 0.2s; cursor: pointer; }
 .match-item:hover, .board-item:hover { background-color: #fbfbfb; }
 
-/* 랭킹 */
-.rank-badge { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: #eee; font-weight: bold; font-size: 0.85rem; }
+/* 랭킹 순위 배지 */
+.rank-badge {
+    width: 28px; height: 28px; display: inline-flex; align-items: center;
+    justify-content: center; border-radius: 50%; background: #eee;
+    font-weight: bold; font-size: 0.85rem;
+}
 .rank-badge.gold { background: #fff3bf; color: #f08c00; }
 
-/* 하단 CTA */
+/* [7. 하단 호출 섹션 (CTA)] */
 .cta-section { background-color: var(--primary-orange); }
-.text-orange { color: var(--primary-orange) !important; }
 
-/* 푸터 */
+/* [8. 푸터 (Footer)] */
 .footer { background: var(--dark-navy); color: white; }
-.footer .social-links i { font-size: 1.5rem; color: white; opacity: 0.6; transition: 0.3s; }
+.footer .social-links i {
+    font-size: 1.5rem; color: white; opacity: 0.6;
+    transition: opacity var(--transition-speed);
+}
 .footer .social-links i:hover { opacity: 1; }
-/* 푸터 링크 스타일 추가 */
+
 .footer-link {
     text-decoration: none !important;
     color: rgba(255, 255, 255, 0.7) !important;
-    transition: all 0.3s ease;
+    transition: all var(--transition-speed) ease;
     display: inline-block;
     padding: 2px 0;
 }
 .footer-link:hover {
-    color: #f37321 !important; /* 주황색 포인트 컬러 */
-    transform: translateX(5px); /* 살짝 오른쪽으로 이동하는 효과 */
+    color: var(--primary-orange) !important;
+    transform: translateX(5px); /* 오른쪽으로 살짝 밀리는 효과 */
 }
+
 .footer h6 {
     color: white;
-    border-bottom: 2px solid #f37321;
+    border-bottom: 2px solid var(--primary-orange);
     display: inline-block;
     padding-bottom: 5px;
 }
 
-/* 회원정보 수정 전용 스타일*/
+/* [9. 회원정보 수정 페이지 전용 (Edit Page)] */
 .edit-wrapper { padding-top: 120px; padding-bottom: 80px; background-color: #f9f9f9; min-height: 90vh; }
 .edit-card { border: none; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
 .form-label { font-weight: 700; color: #444; margin-bottom: 8px; }
 .form-control { padding: 12px 15px; border-radius: 10px; border: 1px solid #ddd; }
-.form-control:focus { border-color: var(--primary-orange); box-shadow: 0 0 0 0.25rem rgba(243, 115, 33, 0.1); }
-.readonly-field { background-color: #eee !important; cursor: not-allowed; color: #777; }
-.input-group-text { background: white; border-radius: 10px 0 0 10px; border-right: none; }
-.input-group .form-control { border-left: none; border-radius: 0 10px 10px 0; }
+.form-control:focus {
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 0 0.25rem rgba(243, 115, 33, 0.1);
+}

@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basketball Hub - 동호회 상세</title>
+    <title>Basketball Hub - 물품 상세</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
@@ -15,30 +15,64 @@
         :root { --primary-orange: #f37321; }
         body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; }
 
-        /* 네비게이션 바 (기본 스타일 유지) */
+        /* 네비게이션 바 */
         .main-nav { background: white; border-bottom: 1px solid #eee; }
         .nav-auth-link { color: #333; text-decoration: none; font-size: 0.9rem; }
         .btn-orange { background-color: var(--primary-orange); border: none; color: white; }
         .btn-orange:hover { background-color: #d65f10; color: white; }
 
-        /* 동호회 상세 섹션 스타일 */
+        /* 이미지 섹션 스타일 수정 */
         .club-detail-container { margin-top: 100px; margin-bottom: 50px; }
-        .main-club-img-wrapper { width: 100%; border-radius: 12px; overflow: hidden; height: 400px; }
+
+        .main-club-img-wrapper {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 450px; /* 메인 이미지 높이 조정 */
+            background-color: #eee;
+        }
         .main-club-img { width: 100%; height: 100%; object-fit: cover; }
 
-        .thumb-img {
-            width: 100%; border-radius: 8px; cursor: pointer; height: 85px;
-            object-fit: cover; border: 2px solid transparent; transition: 0.2s;
+        /* 썸네일 리스트: 최대 5개 나열을 위한 그리드 설정 */
+        .gallery-thumbs {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 정확히 5칸으로 나눔 */
+            gap: 10px;
+            margin-top: 12px;
         }
+
+        .thumb-container {
+            position: relative;
+            aspect-ratio: 1 / 1; /* 정사각형 유지 */
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .thumb-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+
         .thumb-img:hover { opacity: 0.8; }
         .thumb-img.active { border-color: var(--primary-orange); }
 
-        .info-card { background: white; border-radius: 15px; padding: 25px; border: none; }
-        .info-item {  align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px; }
-
-        .text-pre-wrap {
-            white-space: pre-wrap;
+        /* 5개 초과시 숨김 처리 (CSS로 제어하거나 서버에서 5개만 내려보내야 함) */
+        .thumb-container:nth-child(n+6) {
+            display: none;
         }
+
+        /* 상세 정보 카드 */
+        .info-card { background: white; border-radius: 15px; padding: 25px; border: none; height: 100%; }
+        .info-item { padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 12px; }
+        .text-pre-wrap { white-space: pre-wrap; line-height: 1.6; color: #444; }
+
+        /*구매상태 style*/
+        .bg-green-light { background-color: #E8F5E9; color: #2E7D32; }
+        .bg-red-light { background-color: #FFEBEE; color: #C62828; }
     </style>
 </head>
 <body>
@@ -85,82 +119,81 @@
 <main class="container club-detail-container">
     <div class="row g-4">
         <div class="col-lg-7">
-            <div class="main-club-img-wrapper mb-3 shadow-sm">
-                <img id="mainImage" src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1000" class="main-club-img" alt="대표 이미지">
+            <div class="main-club-img-wrapper shadow-sm">
+                <img th:src="${detailGoods.mainImage}" id="mainImage" src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1000" class="main-club-img" alt="대표 이미지">
             </div>
-            <div class="row g-2 gallery-thumbs">
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1546519638-68e109498ffc" width="500" class="thumb-img active"></div>
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1519861531473-9200362f46b3" width="500" class="thumb-img"></div>
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a" width="500" class="thumb-img"></div>
-                <div class="col-3"><img src="https://images.unsplash.com/photo-1511886929837-354d827aae26" width="500" class="thumb-img"></div>
+
+            <div class="gallery-thumbs">
+                <div th:each="detailImage :${detailGoods.getDetailImage()}" class="thumb-container">
+                    <img th:src="${detailImage.goodImage}" src="https://images.unsplash.com/photo-1546519638-68e109498ffc" class="thumb-img active">
+                </div>
+<!--                <div class="thumb-container">-->
+<!--                    <img src="https://images.unsplash.com/photo-1519861531473-9200362f46b3" class="thumb-img">-->
+<!--                </div>-->
+<!--                <div class="thumb-container">-->
+<!--                    <img src="https://images.unsplash.com/photo-1504450758481-7338eba7524a" class="thumb-img">-->
+<!--                </div>-->
+<!--                <div class="thumb-container">-->
+<!--                    <img src="https://images.unsplash.com/photo-1511886929837-354d827aae26" class="thumb-img">-->
+<!--                </div>-->
+<!--                <div class="thumb-container">-->
+<!--                    <img src="https://images.unsplash.com/photo-1519861531473-9200362f46b3" class="thumb-img">-->
+<!--                </div>-->
             </div>
         </div>
 
         <div class="col-lg-5">
-            <div class="info-card shadow-sm">
-                <div class="d-flex align-items-center mb-4">
-                    <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" width="45" class="me-3">
+            <div class="info-card shadow-sm d-flex flex-column">
+                <div>
+                    <span th:if="${detailGoods.salesStatus.name() == 'SALE'}"  class="badge rounded-pill bg-green-light px-3 py-2">구매가능</span>
+                    <span th:if="${detailGoods.salesStatus.name() == 'SOLD_OUT'}"  class="badge rounded-pill bg-red-light px-3 py-2">판매완료</span>
+                </div>
+                <div class="d-flex align-items-center mb-4 mt-3">
                     <div>
-                        <h3 class="fw-bold mb-0">물품 상세</h3>
-                        <span class="text-muted small"><i class="bi bi-geo-alt-fill"></i> 거러ㅐ 위치</span>
+                        <h3 class="fw-bold mb-0">중고 농구화 풀세트</h3>
+                        <span th:text="${detailGoods.location}" class="text-muted small"><i class="bi bi-geo-alt-fill"></i> 서울특별시 강남구</span>
                     </div>
                 </div>
 
-                <div class="info-item">
-                    <div class="fw-bold"> 구매 가격</div>
-                    <div>
-                        <p class="text-muted text-pre-wrap">
-"예제"
-사진처럼 외관 이쁘고 상태 괜찮습니다.
-실사용 거의 없어서 판매합니다.
-
-컴퓨터 2세트 두고 있는데
-집에서는 잘 안 써서 하나 정리합니다.
-
-윈도우11 설치 완료
-엑셀, 워드, 파워포인트, 한글 다 있습니다.
-초기화도 다 해둔 상태입니다.
-
-발로란트, 피파, 롤, 메이플, 로블록스
-잘 돌아갑니다 !!
-
-컴퓨터 + 모니터 + 키보드 + 마우스 + 선
-풀세트 구성입니다.
-
-가까운 곳은 직접 가져다드릴게요.
-1세트당 35만원입니다.</p>
-                    </div>
+                <div class="info-item flex-grow-1">
+                    <div class="fw-bold mb-2">상세 설명</div>
+                    <div th:text="${detailGoods.goodsInfo}" class="text-pre-wrap">사진처럼 외관 이쁘고 상태 괜찮습니다. 실사용 거의 없어서 판매합니다. 윈도우11 설치 완료... (중략) 1세트당 35만원입니다.</div>
                 </div>
 
-                <button id="applyBtn" class="btn btn-orange w-100 py-3 fw-bold mt-3 shadow">
-                    <i class="bi bi-person-plus-fill me-2"></i> 구매 채팅 보내기
-                </button>
+                <div class="mt-auto">
+                    <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+                        <span class="text-muted">판매가</span>
+                        <h4 th:text="|${#numbers.formatInteger(detailGoods.price, 3 , 'COMMA')}|" class="fw-bold text-orange mb-0">350,000원</h4>
+                    </div>
+                    <button id="applyBtn" class="btn btn-orange w-100 py-3 fw-bold shadow">
+                        <i class="bi bi-chat-dots-fill me-2"></i> 구매 채팅 보내기
+                    </button>
+                    <button th:if="${session.user.id} == ${detailGoods.userId}" th:Value="${detailGoods.goodsId}" id="soldOutId" class="btn btn-orange py-3 fw-bold shadow mt-3">
+                        <i class="bi bi-bag-fill"></i> 구매완료버튼
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-
 </main>
-
-
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
 <script>
     $(document).ready(function() {
-        // 갤러리 이미지 클릭 시 메인 이미지 변경 기능
+        // 갤러리 이미지 클릭 시 메인 이미지 변경
         $('.thumb-img').on('click', function() {
             const newSrc = $(this).attr('src');
-            $('#mainImage').attr('src', newSrc);
+            $('#mainImage').fadeOut(100, function() {
+                $(this).attr('src', newSrc).fadeIn(100);
+            });
 
-            // active 클래스 이동
             $('.thumb-img').removeClass('active');
             $(this).addClass('active');
         });
 
-        // 가입 신청 버튼 클릭 이벤트 예시
         $('#applyBtn').on('click', function() {
-            alert("채팅 보내는 기능으로 바꿈");
+            alert("판매자와의 채팅방으로 이동합니다.");
         });
     });
 </script>

@@ -23,6 +23,7 @@ public class MainController {
 
         List<ShowClubDto> showClubDtoList = mainService.getClubs();
         model.addAttribute("clubs", showClubDtoList);
+        model.addAttribute("goods", mainService.findAllGoods());
 
 
         return "/main/index";

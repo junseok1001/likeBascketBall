@@ -26,7 +26,7 @@
                 <ul class="navbar-nav mx-auto fw-medium">
                     <li class="nav-item"><a class="nav-link active" href="#home">홈</a></li>
                     <li class="nav-item"><a class="nav-link" href="#clubs">동호회모집</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#shop">농구용품샵</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#shop">농구용품중고 샵</a></li>
                     <li class="nav-item"><a class="nav-link" href="#matches">친선경기신청</a></li>
                     <li class="nav-item"><a class="nav-link" href="#rankings">경기결과/랭킹</a></li>
                     <li class="nav-item"><a class="nav-link" href="#board">자유게시판</a></li>
@@ -101,22 +101,23 @@
                 <p class="text-muted">최고의 농구 장비로 실력을 향상시키세요</p>
             </div>
             <div class="row g-4">
-                <div class="col-md-3">
-                    <div class="card product-card border-0 shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" class="card-img-top" alt="shoes">
+                <div th:each="good:${goods}" class="col-md-3">
+                    <a th:href="|/goods/detail/${good.goodsId}|" class="card product-card border-0 shadow-sm h-100">
+                        <div style="overflow: hidden;"> <img th:src="${good.mainImage}" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" class="card-img-top" alt="shoes">
+                        </div>
                         <div class="card-body">
-                            <p class="text-muted small mb-1">Nike</p>
-                            <h6 class="fw-bold">나이키 에어 조던 XXXVIII</h6>
+                            <h6 th:text="${good.title}" class="fw-bold">나이키 에어 조던 XXXVIII</h6>
                             <div class="d-flex justify-content-between align-items-center mt-3">
-                                <span class="fw-bold text-orange">259,000원</span>
-                                <button class="btn btn-sm btn-orange-outline"><i class="fas fa-shopping-cart"></i></button>
+                            <span class="fw-bold text-orange">
+                                <span th:text="${#numbers.formatInteger(good.price, 3, 'COMMA')}">259,000</span>원
+                            </span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
             <div class="text-center mt-5">
-                <button class="btn btn-orange text-white px-4 py-2 fw-bold">전체 상품 보기 <i class="fas fa-chevron-right ms-1"></i></button>
+                <a href="/goods" class="btn btn-orange text-white px-4 py-2 fw-bold">전체 상품 보기 <i class="fas fa-chevron-right ms-1"></i></a>
             </div>
         </div>
     </section>
