@@ -149,3 +149,32 @@ body {
     border-color: var(--primary-orange);
     box-shadow: 0 0 0 0.25rem rgba(243, 115, 33, 0.1);
 }
+
+
+/* [추가] 메시지 플로팅 버튼 스타일 */
+.message-floating-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000; /* 네비게이션 보다는 낮거나 적절한 높이 */
+    background-color: var(--dark-navy); /* 네이비 배경 혹은 오렌지 중 선택 */
+    padding: 12px 20px;
+    border-radius: 50px;
+    transition: all var(--transition-speed) ease;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.message-floating-btn:hover {
+    transform: scale(1.05);
+    background-color: var(--primary-orange); /* 호버 시 브랜드 컬러로 변경 */
+    box-shadow: 0 8px 20px rgba(243, 115, 33, 0.3) !important;
+}
+
+/* 모바일에서는 아이콘만 보이게 최적화 (선택 사항) */
+@media (max-width: 768px) {
+    .message-floating-btn {
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 15px;
+    }
+}

@@ -22,6 +22,10 @@ public enum ErrorCode {
 
     // 500 INTERNAL_SERVER_ERROR
     , INTERNAL_SERVER_ERROR(500, "서버에서 처리하는도중 오류가 났습니다.")
+
+
+    // websocket 오류
+    , MESSAGE_FAIL(1006, "메세지 전송 오류 다시 접속 바랍니다")
     ;
 
     private final int status;

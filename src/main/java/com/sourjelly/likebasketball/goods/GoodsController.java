@@ -43,7 +43,6 @@ public class GoodsController {
             return "redirect:/main";
         }
 
-
         return "/goods/goodsDetail";
     }
 
@@ -53,10 +52,6 @@ public class GoodsController {
     }
 
 
-    @GetMapping("/chat")
-    public String chat(){
-        return "/chat/chat";
-    }
 
 
 }

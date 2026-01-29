@@ -2,6 +2,8 @@ package com.sourjelly.likebasketball.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sourjelly.likebasketball.chat.dto.ChatMessageDto;
+import com.sourjelly.likebasketball.common.global.CustomException;
+import com.sourjelly.likebasketball.common.global.ErrorCode;
 import com.sourjelly.likebasketball.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,6 +61,11 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
         // [A] JSON 문자열을 DTO로 변환
         ChatMessageDto chatMsg = objectMapper.readValue(message.getPayload(), ChatMessageDto.class);
 
+        // 보낸 데이터가 enter라면 roomId를 webSocketSession에 저장
+        if(chatMsg.getType() == ChatMessageDto.MessageType.ENTER){
+            session.getAttributes().put("roomId", chatMsg.getRoomId());
+        }
+
         // [B] 세션에서 보낸 사람 ID 추출 (보안을 위해 클라이언트 데이터를 믿지 않고 세션값 사용)
         long senderId = (Long) session.getAttributes().get("userId");
         chatMsg.setSenderId(senderId);
@@ -67,12 +75,23 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
 
         // [D] 같은 방에 있는 사람들에게만 브로드캐스트
         for (WebSocketSession s : sessions.values()) {
+            if(!s.isOpen()){
+                sessions.remove(s.getId());
+                continue;
+            }
+
             // 해당 세션이 가진 방 번호 정보를 확인 (실제론 방 참여 정보 기반으로 필터링)
             Long targetRoomId = (Long) s.getAttributes().get("roomId");
 
+            //webSocket은 객체는 생성되어있지만 연결이 끊긴 상태일수도 있어서 s.isOpen으로 확인한다.
             if (chatMsg.getRoomId().equals(targetRoomId) && s.isOpen()) {
                 // DTO를 다시 JSON으로 변환해서 전송
-                s.sendMessage(new TextMessage(objectMapper.writeValueAsString(chatMsg)));
+                try {
+                    s.sendMessage(new TextMessage(objectMapper.writeValueAsString(chatMsg)));
+                }
+                catch (IOException e){
+                    throw new CustomException(ErrorCode.MESSAGE_FAIL);
+                }
             }
         }
     }
@@ -80,10 +99,43 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
     // 3. 연결 종료 시
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        Long userId = (Long) session.getAttributes().get("userId");
+        Long roomId = (Long) session.getAttributes().get("roomId");
+
+        // 1. 메모리 누수 방지를 위해 반드시 맵에서 제거
         sessions.remove(session.getId());
+
+        // 2. (선택 사항) "OO님이 접속을 종료했습니다"라고 알리고 싶다면?
+        if (roomId != null) {
+            ChatMessageDto leaveNotice = new ChatMessageDto();
+            leaveNotice.setType(ChatMessageDto.MessageType.LEAVE);
+            leaveNotice.setRoomId(roomId);
+            leaveNotice.setSenderId(userId);
+            leaveNotice.setMessage(userId + "님의 연결이 끊겼습니다.");
+            broadcast(leaveNotice);
+        }
+
+        log.info("사용자 {} 연결 종료. 현재 접속자 수: {}", userId, sessions.size());
     }
 
 
+    private void broadcast(ChatMessageDto chatMsg) throws IOException {
+        // 1. DTO를 JSON 문자열로 변환 (배달할 물건 포장)
+        String jsonPayload = objectMapper.writeValueAsString(chatMsg);
 
+        // 2. 현재 서버에 연결된 모든 세션(사람)을 하나씩 확인
+        for (WebSocketSession s : sessions.values()) {
+            // 3. 각 세션이 "어느 방에 들어가 있는지" 확인 (입장 시 저장해둔 값)
+            Long sessionRoomId = (Long) s.getAttributes().get("roomId");
+
+            // 4. 메시지의 방 번호와 세션의 방 번호가 일치하면 전송
+            if (chatMsg.getRoomId().equals(sessionRoomId) && s.isOpen()) {
+                s.sendMessage(new TextMessage(jsonPayload));
+                log.debug("메시지 전송 성공: 대상 UserID={}", s.getAttributes().get("userId"));
+            }
+        }
+    }
 
 }
+
+

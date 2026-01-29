@@ -237,12 +237,6 @@
             justify-content: center;
             align-items: center;
         }
-
-        .icon-btn {
-            color: var(--text-gray);
-            cursor: pointer;
-            font-size: 20px;
-        }
     </style>
 </head>
 <body>
@@ -289,8 +283,6 @@
         </div>
 
         <div class="input-area">
-<!--            <span class="icon-btn">🖼️</span>-->
-<!--            <span class="icon-btn">😊</span>-->
             <input type="text" class="input-box" id="msgInput" placeholder="메시지를 입력하세요...">
             <button class="send-btn" id="sendBtn">➤</button>
         </div>
@@ -299,7 +291,7 @@
 
 <script>
     $(document).ready(function() {
-        // 가상의 대화 데이터 저장소
+        // 가상의 대화 데이터
         const chatData = {
             "강남 농구왕": [
                 { type: 'received', text: '이번 주말 경기 어떠세요?', time: '오전 10:00' },
@@ -314,25 +306,24 @@
 
         // 1. 메시지 렌더링 함수
         function renderChat(userName) {
-            let $container = $('#chatContent');
-            $container.empty(); // 기존 내용 비우기
+            const $container = $('#chatContent');
+            $container.empty();
 
-            let messages = chatData[userName] || [];
+            const messages = chatData[userName] || [];
             messages.forEach(msg => {
                 const msgHtml = `
-                <div class="msg ${msg.type}">
-                    <div class="bubble">${msg.text}</div>
-                    <span class="msg-time">${msg.time}</span>
-                </div>
-            `;
+                    <div class="msg ${msg.type}">
+                        <div class="bubble">${msg.text}</div>
+                        <span class="msg-time">${msg.time}</span>
+                    </div>
+                `;
                 $container.append(msgHtml);
             });
 
-            // 스크롤 하단으로
             $container.scrollTop($container[0].scrollHeight);
         }
 
-        // 초기 화면 로드 (현재 활성화된 항목 기준)
+        // 초기 화면 로드
         renderChat($('.chat-item.active').data('name'));
 
         // 2. 채팅방 클릭 이벤트
@@ -340,69 +331,59 @@
             const name = $(this).data('name');
             const status = $(this).data('status');
 
-            // UI 업데이트
             $('.chat-item').removeClass('active');
             $(this).addClass('active');
 
             $('#currentChatName').text(name);
             $('#currentChatStatus').text(status);
-
-            // 안읽은 메시지 뱃지 숨기기 (선택 시)
             $(this).find('.unread-badge').fadeOut();
 
-            // 대화 내용 교체
             renderChat(name);
         });
 
-        // 3. 메시지 전송 기능
+        // 3. 메시지 전송 함수
         function sendMessage() {
             const $input = $('#msgInput');
             const messageText = $input.val().trim();
-            const currentName = $('#currentChatName').text(); // 수신자 이름 등
+            const currentName = $('#currentChatName').text();
 
             if (messageText !== "") {
-                // 서버로 보낼 데이터 객체
-                let chatMessage = {
-                    receiver: currentName,
-                    content: messageText
-                };
-                console.log(chatMessage);
+                // 시간 생성
+                let now = new Date();
+                let timeStr = now.getHours() >= 12 ? '오후' : '오전';
+                let hours = now.getHours() % 12 || 12;
+                let minutes = now.getMinutes().toString().padStart(2, '0');
+                let formattedTime = `${timeStr} ${hours}:${minutes}`;
 
-            //     $.ajax({
-            //
-            //         contentType: 'application/json',
-            //         data: JSON.stringify(chatMessage),
-            //         success: function(response) {
-            //             // response는 서버에서 생성해서 보내준 데이터 (예: 시간, 전송 성공 여부 등)
-            //             // 서버가 "오전 10:30" 같은 포맷된 시간을 준다고 가정하거나 JS에서 생성
-            //             let now = new Date();
-            //             let timeStr = now.getHours() >= 12 ? '오후' : '오전';
-            //             let formattedTime = `${timeStr} ${now.getHours() % 12 || 12}:${now.getMinutes().toString().padStart(2, '0')}`;
-            //
-            //             // 통신 성공 시에만 화면에 추가
-            //             let msgHtml = `
-            //         <div class="msg sent">
-            //             <div class="bubble">${messageText}</div>
-            //             <span class="msg-time">${formattedTime}</span>
-            //         </div>
-            //     `;
-            //
-            //             $('#chatContent').append(msgHtml);
-            //             $input.val("");
-            //             $('#chatContent').scrollTop($('#chatContent')[0].scrollHeight);
-            //         },
-            //         error: function(xhr, status, error) {
-            //             alert("메시지 전송에 실패했습니다.");
-            //             console.error(error);
-            //         }
-            //     });
-            // }
+                // 화면에 즉시 메시지 추가
+                const msgHtml = `
+                    <div class="msg sent">
+                        <div class="bubble">${messageText}</div>
+                        <span class="msg-time">${formattedTime}</span>
+                    </div>
+                `;
+                $('#chatContent').append(msgHtml);
+
+                // 데이터 보관 (방 이동시 유지용)
+                if(!chatData[currentName]) chatData[currentName] = [];
+                chatData[currentName].push({ type: 'sent', text: messageText, time: formattedTime });
+
+                // 입력창 초기화 및 스크롤 하단 이동
+                $input.val("");
+                $('#chatContent').scrollTop($('#chatContent')[0].scrollHeight);
+
+                /* WebSocket 연동 시점:
+                   socket.send(JSON.stringify({ receiver: currentName, content: messageText }));
+                */
+            }
         }
 
         // 클릭 및 엔터 이벤트 바인딩
         $('#sendBtn').on('click', sendMessage);
         $('#msgInput').on('keypress', function(e) {
-            if (e.key === 'Enter') sendMessage();
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
         });
     });
 </script>

@@ -165,7 +165,7 @@
                         <span class="text-muted">판매가</span>
                         <h4 th:text="|${#numbers.formatInteger(detailGoods.price, 3 , 'COMMA')}|" class="fw-bold text-orange mb-0">350,000원</h4>
                     </div>
-                    <button id="applyBtn" class="btn btn-orange w-100 py-3 fw-bold shadow">
+                    <button th:value="${detailGoods.userId}" id="applyBtn" class="btn btn-orange w-100 py-3 fw-bold shadow">
                         <i class="bi bi-chat-dots-fill me-2"></i> 구매 채팅 보내기
                     </button>
                     <button th:if="${session.user.id} == ${detailGoods.userId}" th:Value="${detailGoods.goodsId}" id="soldOutId" class="btn btn-orange py-3 fw-bold shadow mt-3">
