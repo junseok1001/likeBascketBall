@@ -241,151 +241,199 @@
 </head>
 <body>
 
-<div class="container">
-    <div class="sidebar">
-        <div class="search-container">
-            <input type="text" class="search-bar" placeholder="대화 검색">
-        </div>
-        <div class="chat-list">
-            <div class="chat-item" data-name="강남 농구왕" data-status="온라인">
-                <div class="chat-info">
-                    <div class="chat-header">
-                        <div class="name-tag"><span class="user-name">강남 농구왕</span> <span class="tag">동호회장</span></div>
-                        <span class="time">5분 전</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between">
-                        <span class="last-msg">이번 주말 경기 어떠세요?</span>
-                        <span class="unread-badge">2</span>
+    <div class="container">
+        <div class="sidebar">
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="대화 검색">
+            </div>
+            <div class="chat-list" id="chatListUl">
+                <div th:each="room : ${chatList}"
+                     class="chat-item"
+                     th:classappend="${room.roomId == selectedRoomId} ? 'active' : ''"
+                     th:data-room-id="${room.roomId}"
+                     th:data-nickname="${room.nickName}">
+
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="name-tag">
+                                <span class="user-name" th:text="${room.nickName}">상대방 이름</span>
+                                <span class="tag">GOODS</span>
+                            </div>
+                            <span class="time" th:text="${room.title}">상품명</span>
+                        </div>
+                        <div class="last-msg">채팅을 시작해보세요.</div>
                     </div>
                 </div>
             </div>
-            <div class="chat-item active" data-name="이슛터" data-status="오프라인">
-                <div class="chat-info">
-                    <div class="chat-header">
-                        <div class="name-tag"><span class="user-name">이슛터</span> <span class="tag normal">일반회원</span></div>
-                        <span class="time">1시간 전</span>
-                    </div>
-                    <span class="last-msg">농구화 추천 감사합니다</span>
+        </div>
+
+        <div class="chat-main">
+            <div class="chat-top-bar">
+                <div class="top-user-info">
+                    <div class="user-name" id="currentChatName">대상을 선택해주세요</div>
+                    <div class="status" id="currentChatStatus">대화방에 입장하면 상태가 표시됩니다.</div>
                 </div>
+            </div>
+
+            <div class="chat-content" id="chatContent">
+            </div>
+
+            <div class="input-area">
+                <input type="text" class="input-box" id="msgInput" placeholder="메시지를 입력하세요...">
+                <button class="send-btn" id="sendBtn">➤</button>
             </div>
         </div>
     </div>
 
-    <div class="chat-main">
-        <div class="chat-top-bar">
-            <div class="top-user-info">
-                <div class="user-name" id="currentChatName">이슛터</div>
-                <div class="status" id="currentChatStatus">오프라인</div>
-            </div>
-        </div>
+    <script th:inline="javascript">
+        let ws;
+        let currentRoomId = null;
+        const myId = [[${session.user.id}]];
 
-        <div class="chat-content" id="chatContent">
-        </div>
+        $(document).ready(function() {
+            connectWebSocket();
 
-        <div class="input-area">
-            <input type="text" class="input-box" id="msgInput" placeholder="메시지를 입력하세요...">
-            <button class="send-btn" id="sendBtn">➤</button>
-        </div>
-    </div>
-</div>
+            $(document).on('click', '.chat-item', function() {
+                const roomId = $(this).data('room-id');
+                const nickName = $(this).data('nickname');
 
-<script>
-    $(document).ready(function() {
-        // 가상의 대화 데이터
-        const chatData = {
-            "강남 농구왕": [
-                { type: 'received', text: '이번 주말 경기 어떠세요?', time: '오전 10:00' },
-                { type: 'sent', text: '아직 일정 확인 중입니다!', time: '오전 10:05' }
-            ],
-            "이슛터": [
-                { type: 'sent', text: '농구화 추천 부탁드립니다', time: '오전 10:15' },
-                { type: 'received', text: '나이키 줌 프리크 시리즈 추천드려요', time: '오전 10:20' },
-                { type: 'received', text: '농구화 추천 감사합니다', time: '오전 10:25' }
-            ]
-        };
+                if (currentRoomId === roomId) return;
 
-        // 1. 메시지 렌더링 함수
-        function renderChat(userName) {
-            const $container = $('#chatContent');
-            $container.empty();
+                $('.chat-item').removeClass('active');
+                $(this).addClass('active');
+                $('#currentChatName').text(nickName);
 
-            const messages = chatData[userName] || [];
-            messages.forEach(msg => {
-                const msgHtml = `
-                    <div class="msg ${msg.type}">
-                        <div class="bubble">${msg.text}</div>
-                        <span class="msg-time">${msg.time}</span>
-                    </div>
-                `;
-                $container.append(msgHtml);
+                currentRoomId = roomId;
+                // 순서 중요: UI를 비우고 기록을 로드한 뒤 입장 알림
+                enterRoom(roomId);
             });
 
-            $container.scrollTop($container[0].scrollHeight);
-        }
+            $('#sendBtn').on('click', sendMessage);
 
-        // 초기 화면 로드
-        renderChat($('.chat-item.active').data('name'));
+            $('#msgInput').on('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
 
-        // 2. 채팅방 클릭 이벤트
-        $('.chat-item').on('click', function() {
-            const name = $(this).data('name');
-            const status = $(this).data('status');
-
-            $('.chat-item').removeClass('active');
-            $(this).addClass('active');
-
-            $('#currentChatName').text(name);
-            $('#currentChatStatus').text(status);
-            $(this).find('.unread-badge').fadeOut();
-
-            renderChat(name);
+            const selectedRoomId = [[${selectedRoomId}]];
+            if (selectedRoomId) {
+                $(`.chat-item[data-room-id="${selectedRoomId}"]`).trigger('click');
+            }
         });
 
-        // 3. 메시지 전송 함수
+        function connectWebSocket() {
+            ws = new WebSocket("ws://" + location.host + "/ws/chat");
+
+            ws.onopen = () => console.log("WebSocket Connected ✅");
+
+            ws.onmessage = function(event) {
+                console.log("서버로부터 메시지 수신:", event.data);
+                const data = JSON.parse(event.data);
+
+                // 실시간 수신 조건: 메시지의 roomId와 현재 활성화된 roomId가 일치할 때
+                if(Number(data.roomId) === Number(currentRoomId)) {
+                    if (data.type === 'TALK') {
+                        displayMessage(data);
+                    }
+                }
+            };
+
+            ws.onclose = () => {
+                console.log("WebSocket Disconnected. Retrying...");
+                setTimeout(connectWebSocket, 2000);
+            };
+        }
+
+        function enterRoom(roomId) {
+            currentRoomId = roomId;
+            $('#chatContent').html('');
+
+            // 1. 과거 기록 먼저 로드
+            loadChatHistory(roomId);
+
+            // 2. 서버에 이 방에 입장했음을 알림 (서버 세션에 roomId 저장 목적)
+            const enterMsg = {
+                type: 'ENTER',
+                roomId: roomId,
+                senderId: myId,
+                message: ""
+            };
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(enterMsg));
+            }
+        }
+
         function sendMessage() {
             const $input = $('#msgInput');
             const messageText = $input.val().trim();
-            const currentName = $('#currentChatName').text();
 
-            if (messageText !== "") {
-                // 시간 생성
-                let now = new Date();
-                let timeStr = now.getHours() >= 12 ? '오후' : '오전';
-                let hours = now.getHours() % 12 || 12;
-                let minutes = now.getMinutes().toString().padStart(2, '0');
-                let formattedTime = `${timeStr} ${hours}:${minutes}`;
+            if (!messageText || !currentRoomId) return;
 
-                // 화면에 즉시 메시지 추가
-                const msgHtml = `
-                    <div class="msg sent">
-                        <div class="bubble">${messageText}</div>
-                        <span class="msg-time">${formattedTime}</span>
-                    </div>
-                `;
-                $('#chatContent').append(msgHtml);
+            const talkMsg = {
+                type: 'TALK',
+                roomId: currentRoomId,
+                senderId: myId,
+                message: messageText
+            };
 
-                // 데이터 보관 (방 이동시 유지용)
-                if(!chatData[currentName]) chatData[currentName] = [];
-                chatData[currentName].push({ type: 'sent', text: messageText, time: formattedTime });
-
-                // 입력창 초기화 및 스크롤 하단 이동
-                $input.val("");
-                $('#chatContent').scrollTop($('#chatContent')[0].scrollHeight);
-
-                /* WebSocket 연동 시점:
-                   socket.send(JSON.stringify({ receiver: currentName, content: messageText }));
-                */
+            // 서버로 전송 (서버를 거쳐서 돌아오는 메시지를 displayMessage에서 처리)
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(talkMsg));
+                $input.val("").focus();
+            } else {
+                alert("연결이 끊겨 있습니다. 잠시 후 다시 시도해주세요.");
             }
         }
 
-        // 클릭 및 엔터 이벤트 바인딩
-        $('#sendBtn').on('click', sendMessage);
-        $('#msgInput').on('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
+        function displayMessage(data) {
+            if (data.type !== 'TALK') return;
+
+            const isMe = Number(data.senderId) === Number(myId);
+            const msgClass = isMe ? 'sent' : 'received';
+
+            let formattedTime;
+            if (data.createdAt) {
+                const date = new Date(data.createdAt);
+                formattedTime = (date.getHours() >= 12 ? '오후 ' : '오전 ') + (date.getHours() % 12 || 12) + ":" + date.getMinutes().toString().padStart(2, '0');
+            } else {
+                const now = new Date();
+                formattedTime = (now.getHours() >= 12 ? '오후 ' : '오전 ') + (now.getHours() % 12 || 12) + ":" + now.getMinutes().toString().padStart(2, '0');
             }
-        });
-    });
-</script>
+
+            const msgHtml = `
+            <div class="msg ${msgClass}">
+                <div class="bubble">${data.message}</div>
+                <span class="msg-time">${formattedTime}</span>
+            </div>
+        `;
+
+            $('#chatContent').append(msgHtml);
+            $('#chatContent').scrollTop($('#chatContent')[0].scrollHeight);
+        }
+
+        function loadChatHistory(roomId) {
+            $.ajax({
+                url: '/chat/messages/' + roomId,
+                method: 'GET',
+                success: function(messages) {
+                    messages.forEach(function(msg) {
+                        displayMessage({
+                            senderId: msg.senderId,
+                            message: msg.message,
+                            type: 'TALK',
+                            createdAt: msg.createdAt
+                        });
+                    });
+                    console.log("과거 내역 로드 완료:", messages.length, "개");
+                },
+                error: function(xhr) {
+                    console.error("과거 기록 로드 실패. 상태코드:", xhr.status);
+                }
+            });
+        }
+    </script>
 </body>
 </html>

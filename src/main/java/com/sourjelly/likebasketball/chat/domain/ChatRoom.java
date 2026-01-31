@@ -28,6 +28,7 @@ public class ChatRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Enumerated(EnumType.STRING)
     private RoomType roomType;
     private long targetId;
     @CreationTimestamp
