@@ -9,6 +9,7 @@ public enum ErrorCode {
 
     // 400 Bad Request
     INVALID_PARAMETER(400,  "잘못된 요청 파라미터입니다.")
+    , CREATE_FAIL(400, "채팅방을 생성할수 없습니다.")
     // 404 notFound
     , PARAMETER_NOT_FOUND(404, "요청된 정보가 잘못되었습니다.")
     , CLUB_NOT_FOUND(404, "클럽을 찾을수 없습니다.")

@@ -251,13 +251,14 @@
                      class="chat-item"
                      th:classappend="${room.roomId == selectedRoomId} ? 'active' : ''"
                      th:data-room-id="${room.roomId}"
-                     th:data-nickname="${room.nickName}">
+                     th:data-nickname="${room.nickName}"
+                     th:data-title="${room.title}">
 
                     <div class="chat-info">
                         <div class="chat-header">
                             <div class="name-tag">
                                 <span class="user-name" th:text="${room.nickName}">상대방 이름</span>
-                                <span class="tag">GOODS</span>
+                                <span class="tag" th:text="${room.roomType}">GOODS</span>
                             </div>
                             <span class="time" th:text="${room.title}">상품명</span>
                         </div>
@@ -296,6 +297,8 @@
             $(document).on('click', '.chat-item', function() {
                 const roomId = $(this).data('room-id');
                 const nickName = $(this).data('nickname');
+                const title = $(this).data('title');
+                console.log(title);
                 console.log(roomId);
                 console.log(nickName);
 
@@ -304,15 +307,39 @@
                 $('.chat-item').removeClass('active');
                 $(this).addClass('active');
                 $('#currentChatName').text(nickName);
+                $('#currentChatStatus').text(title);
 
                 currentRoomId = roomId;
                 // 순서 중요: UI를 비우고 기록을 로드한 뒤 입장 알림
                 enterRoom(roomId);
             });
 
-            $('#sendBtn').on('click', sendMessage);
+            $('#sendBtn').on('click', function(){
+
+                if(currentRoomId == null){
+                    alert("현재 선택된 방이 없습니다");
+                    return;
+                }
+                if(myId == null){
+                    alert("로그인이 안되어 있습니다. 재로그인하세요");
+                    return;
+                }
+
+                sendMessage();
+
+            });
 
             $('#msgInput').on('keypress', function(e) {
+
+                if(currentRoomId == null){
+                    alert("현재 선택된 방이 없습니다");
+                    return;
+                }
+                if(myId == null){
+                    alert("로그인이 안되어 있습니다. 재로그인하세요");
+                    return;
+                }
+
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     sendMessage();
@@ -398,7 +425,8 @@
             let formattedTime;
             if (data.createdAt) {
                 const date = new Date(data.createdAt);
-                formattedTime = (date.getHours() >= 12 ? '오후 ' : '오전 ') + (date.getHours() % 12 || 12) + ":" + date.getMinutes().toString().padStart(2, '0');
+                formattedTime = (date.getHours() >= 12 ? '오후 ' : '오전 ')
+                    + (date.getHours() % 12 || 12) + ":" + date.getMinutes().toString().padStart(2, '0');
             } else {
                 const now = new Date();
                 formattedTime = (now.getHours() >= 12 ? '오후 ' : '오전 ') + (now.getHours() % 12 || 12) + ":" + now.getMinutes().toString().padStart(2, '0');

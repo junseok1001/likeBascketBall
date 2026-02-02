@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     // 상품 ID와 타입으로 기존 방이 있는지 확인
-    Optional<ChatRoom> findByRoomTypeAndTargetId(ChatRoom.RoomType roomType, long targetId);
+    Optional<ChatRoom> findByRoomTypeAndTargetIdAndSenderId(ChatRoom.RoomType roomType, long targetId, long senderId);
 }

@@ -31,6 +31,7 @@ public class ChatRoom {
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
     private long targetId;
+    private long senderId;
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp

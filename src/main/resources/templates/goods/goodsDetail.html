@@ -195,11 +195,17 @@
         $('#applyBtn').on('click', function() {
             // input/button의 value에 담긴 판매자 ID와 상품 ID를 가져옵니다.
             const sellerId = $(this).val();
-            const goodsId = [[${detailGoods.goodsId}]]; // Thymeleaf 변수
+            const goodsId = [[${detailGoods.goodsId}]];// Thymeleaf 변수
 
             $.post('/chat/room/goods', { goodsId: goodsId, sellerId: sellerId }, function(roomId) {
-                // 성공 시 roomId를 파라미터로 붙여 이동
-                location.href = '/chat?roomId=' + roomId;
+
+                location.href = '/chat';
+            }).fail(function(jqXHR, textStatus) {
+                // 실패 시 처리 (네트워크 에러, 404, 500 등)
+                console.log(jqXHR);
+                console.log(jqXHR.responseJSON.message);
+                // console.error("통신 실패: " + textStatus, errorThrown);
+                alert(jqXHR.responseJSON.message);
             });
         });
     });

@@ -18,6 +18,7 @@ public class RoomInfoDto {
     private long goodsId;
     private String title;
 
+
     // user goods 올린 사용자 정보 or 채팅방 상대방 정보
     private long userId;
     private String nickName;

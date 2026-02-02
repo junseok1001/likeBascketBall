@@ -3,9 +3,13 @@ package com.sourjelly.likebasketball.chat;
 import com.sourjelly.likebasketball.chat.domain.ChatMessage;
 import com.sourjelly.likebasketball.chat.dto.RoomInfoDto;
 import com.sourjelly.likebasketball.chat.service.ChatService;
+import com.sourjelly.likebasketball.common.global.CustomException;
+import com.sourjelly.likebasketball.common.global.ErrorCode;
+import com.sourjelly.likebasketball.common.responseApi.ResponseApi;
 import com.sourjelly.likebasketball.user.domain.User;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,9 +23,12 @@ public class ChatRestController {
 
     // 메세지 방 생성 하기
     @PostMapping("/room/goods")
-    public long getRoom(@RequestParam long goodsId, @RequestParam long sellerId, HttpSession session) {
+    public ResponseEntity<ResponseApi> getRoom(@RequestParam long goodsId, @RequestParam long sellerId, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        return chatService.createOrGetGoodsRoom(goodsId, sellerId, user.getId());
+        if(chatService.createOrGetGoodsRoom(goodsId, sellerId, user.getId()) == -1){
+            throw new CustomException(ErrorCode.CREATE_FAIL);
+        }
+        return ResponseEntity.ok(ResponseApi.success("채팅방 생성성공"));
     }
 
     // 메세지 기록 가져오기
