@@ -10,6 +10,7 @@ import com.sourjelly.likebasketball.chat.repository.ChatParticipantRepository;
 import com.sourjelly.likebasketball.chat.repository.ChatRoomRepository;
 import com.sourjelly.likebasketball.goods.doamin.Goods;
 import com.sourjelly.likebasketball.goods.repository.GoodsRepository;
+import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +33,14 @@ public class ChatService {
     @Transactional
     public long createOrGetGoodsRoom(long goodsId, long sellerId, long buyerId) {
         return chatRoomRepository.findByRoomTypeAndTargetId(ChatRoom.RoomType.GOODS, goodsId)
-                .map(ChatRoom::getId)
+                .map(ChatRoom::getId)// map형태로 {key, "value"} 가아닌 mapping한다 라는 뜻의 map
                 .orElseGet(() -> {
                     // 방 생성
                     ChatRoom room = chatRoomRepository.save(ChatRoom.builder()
                             .roomType(ChatRoom.RoomType.GOODS)
                             .targetId(goodsId)
                             .build());
+
                     // 참여자 등록 (판매자, 구매자)
                     chatParticipantRepository.save(ChatParticipant.builder().roomId(room.getId()).userId(sellerId).build());
                     chatParticipantRepository.save(ChatParticipant.builder().roomId(room.getId()).userId(buyerId).build());
@@ -51,10 +53,17 @@ public class ChatService {
         return chatParticipantRepository.findAllByUserId(myUserId).stream().map(p -> {
             ChatRoom room = chatRoomRepository.findById(p.getRoomId()).get();
             Goods goods = goodsRepository.findById(room.getTargetId()).get();
+
+            User user = userRepository.findById(goods.getUserId()).get();
             // 상대방 찾기 (참여자 중 내가 아닌 사람)
             // 실제로는 room_id로 참여자 리스트를 뽑아 필터링해야 하지만 간단히 구현
             return RoomInfoDto.builder()
                     .roomId(room.getId())
+                    .roomType(room.getRoomType())
+                    .userId(user.getId())
+                    .userStatus(user.getUserStatus())
+                    .nickName(user.getNickName())
+                    .goodsId(goods.getId())
                     .title(goods.getTitle()) // 상품 제목을 방 이름으로
                     .build();
         }).collect(Collectors.toList());

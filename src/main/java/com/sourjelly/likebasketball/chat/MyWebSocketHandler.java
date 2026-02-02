@@ -3,8 +3,6 @@ package com.sourjelly.likebasketball.chat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sourjelly.likebasketball.chat.dto.ChatMessageDto;
 import com.sourjelly.likebasketball.chat.service.ChatService;
-import com.sourjelly.likebasketball.common.global.CustomException;
-import com.sourjelly.likebasketball.common.global.ErrorCode;
 import com.sourjelly.likebasketball.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

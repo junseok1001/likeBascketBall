@@ -296,6 +296,8 @@
             $(document).on('click', '.chat-item', function() {
                 const roomId = $(this).data('room-id');
                 const nickName = $(this).data('nickname');
+                console.log(roomId);
+                console.log(nickName);
 
                 if (currentRoomId === roomId) return;
 
@@ -347,7 +349,6 @@
         }
 
         function enterRoom(roomId) {
-            currentRoomId = roomId;
             $('#chatContent').html('');
 
             // 1. 과거 기록 먼저 로드

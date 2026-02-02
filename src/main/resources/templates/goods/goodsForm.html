@@ -251,9 +251,9 @@
                 , error: function(xhr){
                     let error = xhr.responseJSON;
 
-                    if(error.status == 404){
+                    if(error.status === 404){
                         alert(error.message);
-                    }else if(error.status == 400){
+                    }else if(error.status === 400){
                         alert(error.message);
                     }
 

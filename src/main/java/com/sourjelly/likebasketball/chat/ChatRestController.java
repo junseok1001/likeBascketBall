@@ -17,15 +17,18 @@ public class ChatRestController {
 
     private final ChatService chatService;
 
+    // 메세지 방 생성 하기
     @PostMapping("/room/goods")
     public long getRoom(@RequestParam long goodsId, @RequestParam long sellerId, HttpSession session) {
         User user = (User) session.getAttribute("user");
         return chatService.createOrGetGoodsRoom(goodsId, sellerId, user.getId());
     }
 
+    // 메세지 기록 가져오기
     @GetMapping("/messages/{roomId}")
     public List<ChatMessage> getChatHistory(@PathVariable long roomId) {
         // 최근 50개만 가져오거나 하는 처리가 나중에 필요하겠지만, 일단 전체 조회
         return chatService.getChatMessages(roomId);
     }
+
 }
