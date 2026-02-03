@@ -54,6 +54,30 @@ dependencies {
 
     //websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    //Querydsl 라이브러리
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+
+    // QClass 생성을 위한 도구
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+}
+
+// QClass 생성 및 관리 설정
+def querydslDir = "src/main/generated" // QClass 저장 위치
+
+sourceSets {
+    main.java.srcDirs += [ querydslDir ]
+}
+
+tasks.withType(JavaCompile) {
+    options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+// clean 태그 실행 시 생성된 QClass 삭제
+clean {
+    delete file(querydslDir)
 }
 
 tasks.named('test') {

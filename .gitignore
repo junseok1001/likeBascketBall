@@ -40,3 +40,6 @@ out/
 
 ## 데이터베이스##
 security-variable.yml
+
+## 자동생성 도구 ## querydsl 관련 자동생성 도구
+/src/main/generated/
