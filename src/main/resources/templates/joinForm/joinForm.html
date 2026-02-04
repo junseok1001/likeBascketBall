@@ -89,7 +89,7 @@
 
             <!-- local로그인 시 local value / kakao 로그인시 kakao value로 나눠서 로그인 -->
             <div class="mb-3">
-                <input th:value="${session.provider != null ? session.provider : 'local'}" type="input" class="form-control" id="joinProviderInput" value="local" readonly>
+                <input hidden th:value="${session.provider != null ? session.provider : 'local'}" type="input" class="form-control" id="joinProviderInput" value="local" readonly>
             </div>
 
             <button type="submit" class="btn-submit">가입 신청하기</button>

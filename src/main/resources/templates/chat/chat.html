@@ -472,36 +472,55 @@
         }
 
 
-        function loadChatHistory(roomId) {
+        let isChatLoading = false; // 중복 로딩 방지 플래그
 
-            $(".chat-content").scroll(function(){
+        function loadChatHistory(roomId) {
+            // 기존 스크롤 이벤트 해제 후 다시 등록 (방 변경 시 중복 등록 방지)
+            $(".chat-content").off("scroll").on("scroll", function() {
                 let $window = $(this);
                 let scrollTop = $window.scrollTop();
 
-                if(scrollTop < 0.5 ){
-                    let msg = $(".msg").first();
-                    let lastMsgId = msg.attr("value")
-                    console.log(lastMsgId);
+                if (scrollTop <= 5 && !isChatLoading) {
+                    let firstMsg = $(".msg").first();
+                    let lastMsgId = firstMsg.attr("value");
+
+                    if (!lastMsgId) return;
+
+                    isChatLoading = true; // 로딩 시작
+
+                    // 처음 스크롤 저장
+                    const previousHeight = $window[0].scrollHeight;
+
                     $.ajax({
-                        url: "/chat/message"
-                        , method: "get"
-                        , data: {"roomId": roomId, "messageId": lastMsgId}
-                        , success: function(messages) {
-                            messages.forEach(function (msg) {
-                                displayHistoryMessage({
-                                    messageId: msg.id,
-                                    senderId: msg.senderId,
-                                    message: msg.message,
-                                    type: 'TALK',
-                                    createdAt: msg.createdAt
+                        url: "/chat/message",
+                        method: "get",
+                        data: { "roomId": roomId, "messageId": lastMsgId },
+                        success: function(messages) {
+                            if (messages && messages.length > 0) {
+                                messages.forEach(function(msg) {
+                                    displayHistoryMessage({
+                                        messageId: msg.id,
+                                        senderId: msg.senderId,
+                                        message: msg.message,
+                                        type: 'TALK',
+                                        createdAt: msg.createdAt
+                                    }, false); // 스크롤 하단 이동 방지 옵션 추가
                                 });
-                            });
-                        }
-                        , error: function(xhr) {
-                            console.error("과거 기록 로드 실패. 상태코드:", xhr.status);
+
+                                // 메세지 생성후 높이 저장
+                                const newHeight = $window[0].scrollHeight;
+
+
+                                // 메세지 로드된후 높이 에서 전에 높이 빼기
+                                $window.scrollTop(newHeight - previousHeight);
+                            }
+                            isChatLoading = false; // 로딩 종료
+                        },
+                        error: function(xhr) {
+                            console.error("과거 기록 로드 실패:", xhr.status);
+                            isChatLoading = false;
                         }
                     });
-
                 }
             });
 
