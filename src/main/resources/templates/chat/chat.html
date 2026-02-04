@@ -364,6 +364,7 @@
                 // 실시간 수신 조건: 메시지의 roomId와 현재 활성화된 roomId가 일치할 때
                 if(Number(data.roomId) === Number(currentRoomId)) {
                     if (data.type === 'TALK') {
+                        console.log(data);
                         displayMessage(data);
                     }
                 }
@@ -433,7 +434,7 @@
             }
 
             const msgHtml = `
-            <div class="msg ${msgClass}">
+            <div value="${data.messageId}" class="msg ${msgClass}">
                 <div class="bubble">${data.message}</div>
                 <span class="msg-time">${formattedTime}</span>
             </div>
@@ -443,25 +444,89 @@
             $('#chatContent').scrollTop($('#chatContent')[0].scrollHeight);
         }
 
+        function displayHistoryMessage(data) {
+            if (data.type !== 'TALK') return;
+
+            const isMe = Number(data.senderId) === Number(myId);
+            const msgClass = isMe ? 'sent' : 'received';
+
+            let formattedTime;
+            if (data.createdAt) {
+                const date = new Date(data.createdAt);
+                formattedTime = (date.getHours() >= 12 ? '오후 ' : '오전 ')
+                    + (date.getHours() % 12 || 12) + ":" + date.getMinutes().toString().padStart(2, '0');
+            } else {
+                const now = new Date();
+                formattedTime = (now.getHours() >= 12 ? '오후 ' : '오전 ') + (now.getHours() % 12 || 12) + ":" + now.getMinutes().toString().padStart(2, '0');
+            }
+
+            const msgHtml = `
+            <div value="${data.messageId}" class="msg ${msgClass}">
+                <div class="bubble">${data.message}</div>
+                <span class="msg-time">${formattedTime}</span>
+            </div>
+        `;
+
+            $('#chatContent').prepend(msgHtml);
+            $('#chatContent').scrollTop($('#chatContent')[0].scrollHeight);
+        }
+
+
         function loadChatHistory(roomId) {
+
+            $(".chat-content").scroll(function(){
+                let $window = $(this);
+                let scrollTop = $window.scrollTop();
+
+                if(scrollTop < 0.5 ){
+                    let msg = $(".msg").first();
+                    let lastMsgId = msg.attr("value")
+                    console.log(lastMsgId);
+                    $.ajax({
+                        url: "/chat/message"
+                        , method: "get"
+                        , data: {"roomId": roomId, "messageId": lastMsgId}
+                        , success: function(messages) {
+                            messages.forEach(function (msg) {
+                                displayHistoryMessage({
+                                    messageId: msg.id,
+                                    senderId: msg.senderId,
+                                    message: msg.message,
+                                    type: 'TALK',
+                                    createdAt: msg.createdAt
+                                });
+                            });
+                        }
+                        , error: function(xhr) {
+                            console.error("과거 기록 로드 실패. 상태코드:", xhr.status);
+                        }
+                    });
+
+                }
+            });
+
             $.ajax({
                 url: '/chat/messages/' + roomId,
                 method: 'GET',
                 success: function(messages) {
                     messages.forEach(function(msg) {
                         displayMessage({
+                            messageId:msg.id,
                             senderId: msg.senderId,
                             message: msg.message,
                             type: 'TALK',
                             createdAt: msg.createdAt
                         });
                     });
+                    console.log("과거리스트" + messages);
                     console.log("과거 내역 로드 완료:", messages.length, "개");
                 },
                 error: function(xhr) {
                     console.error("과거 기록 로드 실패. 상태코드:", xhr.status);
                 }
             });
+
+
         }
     </script>
 </body>

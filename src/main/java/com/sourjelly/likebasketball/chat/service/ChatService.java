@@ -14,8 +14,11 @@ import com.sourjelly.likebasketball.user.domain.User;
 import com.sourjelly.likebasketball.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,6 +89,13 @@ public class ChatService {
     }
     // 채팅방의 채팅 기록 가져오기
     public List<ChatMessage> getChatMessages(long roomId) {
-        return chatMessageRepository.findAllByRoomIdOrderByCreatedAtAsc(roomId);
+        List<ChatMessage> messages = chatMessageRepository.findTop7ByRoomIdOrderByCreatedAtAsc(roomId);
+        Collections.reverse(messages);
+       return messages;
+    }
+
+
+    public List<ChatMessage> getChatMessage(long roomId, long messageId){
+        return chatMessageRepository.findFirst7ByRoomIdAndIdGreaterThanOrderByIdAsc(roomId, messageId);
     }
 }
