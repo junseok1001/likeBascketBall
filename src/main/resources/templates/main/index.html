@@ -1,58 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basketball Hub - 농구인들의 모든 것</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Oswald:wght@600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="/main/css/style.css">
-</head>
-<body>
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
 
-    <nav class="navbar navbar-expand-lg fixed-top main-nav">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">
-                <img src="https://cdn-icons-png.flaticon.com/512/889/889455.png" alt="logo" width="30" class="me-2"> Basketball Hub
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto fw-medium">
-                    <li class="nav-item"><a class="nav-link active" href="#home">홈</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#clubs">동호회모집</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#shop">농구용품샵</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#matches">친선경기신청</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#rankings">경기결과/랭킹</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#board">자유게시판</a></li>
-                </ul>
-                <div class="d-flex align-items-center gap-3">
-                    <th:block th:if="${session.user == null}">
-                        <a href="/user/login" class="nav-auth-link">로그인</a>
-                        <a href="/user/join" class="btn btn-orange text-white px-4 fw-bold shadow-sm">회원가입</a>
-                    </th:block>
-                    <th:block th:unless="${session.user== null}">
-                        <div class="dropdown">
-                            <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-person-fill  nav-auth-link fs-4"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/user/logout">로그아웃</a></li>
-                                <li><a class="dropdown-item" href="/user/detail">회원정보</a></li>
-                                <th:block th:if="${session.user.userStatus.name() == 'CLUB_PERSISTENT'}"><li><a class="dropdown-item" th:href="|/club/info/${session.user.id}|">동호회 관리</a></li></th:block>
-                            </ul>
-                        </div>
-                    </th:block>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <link layout:fragment="style" rel="stylesheet" href="/main/css/style.css">
 
+
+<th:block layout:fragment="contents">
     <header id="home" class="hero-section">
         <div class="hero-overlay"></div>
         <div class="container hero-container text-center text-white">
@@ -101,22 +56,23 @@
                 <p class="text-muted">최고의 농구 장비로 실력을 향상시키세요</p>
             </div>
             <div class="row g-4">
-                <div class="col-md-3">
-                    <div class="card product-card border-0 shadow-sm">
-                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" class="card-img-top" alt="shoes">
+                <div th:each="good:${goods}" class="col-md-3">
+                    <a th:href="|/goods/detail/${good.goodsId}|" class="card product-card border-0 shadow-sm h-100">
+                        <div style="overflow: hidden;"> <img th:src="${good.mainImage}" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500" class="card-img-top" alt="shoes">
+                        </div>
                         <div class="card-body">
-                            <p class="text-muted small mb-1">Nike</p>
-                            <h6 class="fw-bold">나이키 에어 조던 XXXVIII</h6>
+                            <h6 th:text="${good.title}" class="fw-bold">나이키 에어 조던 XXXVIII</h6>
                             <div class="d-flex justify-content-between align-items-center mt-3">
-                                <span class="fw-bold text-orange">259,000원</span>
-                                <button class="btn btn-sm btn-orange-outline"><i class="fas fa-shopping-cart"></i></button>
+                            <span class="fw-bold text-orange">
+                                <span th:text="${#numbers.formatInteger(good.price, 3, 'COMMA')}">259,000</span>원
+                            </span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
             <div class="text-center mt-5">
-                <button class="btn btn-orange text-white px-4 py-2 fw-bold">전체 상품 보기 <i class="fas fa-chevron-right ms-1"></i></button>
+                <a href="/goods" class="btn btn-orange text-white px-4 py-2 fw-bold">전체 상품 보기 <i class="fas fa-chevron-right ms-1"></i></a>
             </div>
         </div>
     </section>
@@ -231,58 +187,42 @@
         </div>
     </section>
 
-    <footer class="footer py-5 text-white" style="background-color: #1a1d23;">
-        <div class="container py-4">
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <h4 class="fw-bold text-white mb-3">🏀 Basketball Hub</h4>
-                    <p class="opacity-50">농구인들을 위한 최고의 커뮤니티 플랫폼</p>
-                    <div class="social-links mt-4">
-                        <a href="#" class="me-3 text-white opacity-50"><i class="fab fa-instagram fs-4"></i></a>
-                        <a href="#" class="me-3 text-white opacity-50"><i class="fab fa-youtube fs-4"></i></a>
-                        <a href="#" class="text-white opacity-50"><i class="fab fa-facebook fs-4"></i></a>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <h6 class="fw-bold mb-3">서비스</h6>
-                    <ul class="list-unstyled small">
-                        <li><a href="#clubs" class="footer-link">동호회 찾기</a></li>
-                        <li><a href="#shop" class="footer-link">용품 구매</a></li>
-                        <li><a href="#matches" class="footer-link">친선경기</a></li>
-                        <li><a href="#rankings" class="footer-link">랭킹</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-2">
-                    <h6 class="fw-bold mb-3">커뮤니티</h6>
-                    <ul class="list-unstyled small">
-                        <li><a href="#board" class="footer-link">자유게시판</a></li>
-                        <li><a href="#" class="footer-link">채팅</a></li>
-                        <li><a href="#" class="footer-link">이벤트</a></li>
-                        <li><a href="#" class="footer-link">공지사항</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-2">
-                    <h6 class="fw-bold mb-3">고객지원</h6>
-                    <ul class="list-unstyled small">
-                        <li><a href="#" class="footer-link">문의하기</a></li>
-                        <li><a href="#" class="footer-link">이용약관</a></li>
-                        <li><a href="#" class="footer-link">개인정보처리방침</a></li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="my-5 opacity-25">
-            <div class="d-flex justify-content-between align-items-center opacity-50 small">
-                <p class="mb-0">© 2025 Basketball Hub. All rights reserved.</p>
-                <p class="mb-0">Powered by Readdy</p>
-            </div>
+    <th:block th:unless="${session.user == null}">
+        <div class="message-floating-btn shadow-lg">
+            <a href="/chat" class="d-flex align-items-center text-decoration-none">
+                <span class="badge bg-danger rounded-pill me-2"></span> <i class="bi bi-chat-dots-fill fs-4 text-white"></i>
+                <span class="ms-2 text-white fw-bold d-none d-md-inline">메시지</span>
+            </a>
         </div>
-    </footer>
+    </th:block>
+</th:block>
 
+    <script layout:fragment="script">
+        $(document).ready(function() {
+            // 1. 스크롤 시 네비게이션 스타일 변경
+            $(window).scroll(function() {
+                if ($(this).scrollTop() > 100) {
+                    $('.main-nav').addClass('scrolled');
+                } else {
+                    $('.main-nav').removeClass('scrolled');
+                }
+            });
 
+            // 2. 스무스 스크롤 (Anchor 링크 클릭 시)
+            $('a.nav-link').on('click', function(event) {
+                if (this.hash !== "") {
+                    event.preventDefault();
+                    var hash = this.hash;
+                    $('html, body').animate({
+                        scrollTop: $(hash).offset().top - 80
+                    }, 800);
+                }
+            });
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="/main/js/script.js"></script>
-</body>
+            // 3. 버튼 클릭 시 피드백 (간단 로직)
+            $('.btn-orange, .btn-dark').on('click', function() {
+                console.log("Button Clicked: " + $(this).text().trim());
+            });
+        });
+    </script>
 </html>
