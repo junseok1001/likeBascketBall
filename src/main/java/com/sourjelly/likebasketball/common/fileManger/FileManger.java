@@ -14,10 +14,14 @@ import java.util.List;
 @Slf4j
 public class FileManger {
 
-    public final static String FILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload\\clubDetailPhoto";
-    public final static String PROFILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload\\clubProfile";
-    public final static String GOODS_MAINPHOTO_PATH="D:\\webInventor\\personalproject\\project\\upload\\goodsMainPhoto";
-    public final static String GOODS_DETAILPHOTO_PATH="D:\\webInventor\\personalproject\\project\\upload\\goodsDetailPhoto";
+//    public final static String FILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload\\clubDetailPhoto";
+    public final static String FILE_UPLOAD_PATH="/home/ec2-user/upload/clubDetailPhoto";
+//    public final static String PROFILE_UPLOAD_PATH="D:\\webInventor\\personalproject\\project\\upload\\clubProfile";
+    public final static String PROFILE_UPLOAD_PATH="/home/ec2-user/upload/clubProfile";
+//    public final static String GOODS_MAINPHOTO_PATH="D:\\webInventor\\personalproject\\project\\upload\\goodsMainPhoto";
+    public final static String GOODS_MAINPHOTO_PATH="/home/ec2-user/upload/goodsDetailPhoto";
+//    public final static String GOODS_DETAILPHOTO_PATH="D:\\webInventor\\personalproject\\project\\upload\\goodsDetailPhoto";
+    public final static String GOODS_DETAILPHOTO_PATH="/home/ec2-user/upload/goodsMainPhoto";
 
     public static String saveFile(long userId, MultipartFile file){
 
